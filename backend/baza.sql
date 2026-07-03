@@ -78,3 +78,17 @@ CREATE TABLE powiadomienia (
     przeczytane BOOL NOT NULL,
     data TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE sesje (
+    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    session_hash TEXT UNIQUE NOT NULL,
+    uzytkownik_id INTEGER NOT NULL,
+    data_utworzenia TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    ostatnia_aktywnosc TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    data_wygasniecia TIMESTAMP NOT NULL,
+
+    CONSTRAINT fk_sesje_uzytkownicy
+        FOREIGN KEY (uzytkownik_id)
+        REFERENCES uzytkownicy(id)
+        ON DELETE CASCADE
+);
