@@ -3,12 +3,13 @@
 # dependencies
 node_modules/
 
+.vscode
 # Expo
 .expo/
 dist/
 web-build/
 expo-env.d.ts
-.vscode
+
 # Native
 .kotlin/
 *.orig.*
