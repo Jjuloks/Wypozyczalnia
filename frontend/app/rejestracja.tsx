@@ -1,10 +1,11 @@
 import { Tabs } from "expo-router";
 import { router } from "expo-router";
 import { useState } from "react";
-import { Button, TextInput, View,StyleSheet,Text } from "react-native";
+import { Button, TextInput, View,StyleSheet,Text, TouchableOpacity } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { ThemedView } from "./components/themed-view";
 import { ThemedText } from "./components/themed-text";
+import { Header } from "@react-navigation/elements";
 
 export default function Rejestracja() {
     const [imie,setImie] =  useState('')
@@ -58,55 +59,103 @@ export default function Rejestracja() {
     const zakladanieKonta =()=> {
         if(walidacja_adresu_email() === true && walidacja_hasla() === true){
             alert('Pomyslnie zalozenie konta')
+            router.replace("/(tabs)/user")
         }
 
        
     }
   return (
-  <ThemedText>
+ 
      <SafeAreaProvider style={styles.container}>
-        <SafeAreaView>
-          <label>Imie</label>
-          <TextInput value={imie} onChangeText={val => setImie(val)} ></TextInput>
+        <SafeAreaView style={styles.safeArea}>
+            <ThemedView style={styles.innerContainer}> 
+                <ThemedText type="title" style={styles.title} >Rejestracja konta</ThemedText>
+
+                <View style={styles.form}>
+          <label style={styles.labels}>Imie</label>
+          <TextInput value={imie} onChangeText={val => setImie(val)}  style={styles.inputs}></TextInput>
 
 
-          <label>Nazwisko</label>
-          <TextInput value={nazwisko} onChangeText={val => setNazwisko(val)}></TextInput>
+          <label style={styles.labels}>Nazwisko</label>
+          <TextInput value={nazwisko} onChangeText={val => setNazwisko(val)} style={styles.inputs}></TextInput>
 
-          <label>Adres e-mail</label>
-          <TextInput value={adres} onChangeText={val=> setAdres(val)}></TextInput>
+          <label style={styles.labels}>Adres e-mail</label>
+          <TextInput value={adres} onChangeText={val=> setAdres(val)} style={styles.inputs}></TextInput>
     
-        <label>Hasło</label>
-             <TextInput secureTextEntry={true} value={haslo} onChangeText={val=> setHaslo(val)} ></TextInput>
+        <label style={styles.labels}>Hasło</label>
+             <TextInput secureTextEntry={true} value={haslo} onChangeText={val=> setHaslo(val)} style={styles.inputs} ></TextInput>
 
 
-        <Button title="Zaloz konto" onPress={()=> zakladanieKonta()}></Button>
+       <TouchableOpacity style={styles.createButton} onPress={zakladanieKonta}>
+    <Text style={styles.createButtonText}>ZAŁÓŻ KONTO</Text>
+</TouchableOpacity>
+        </View>
+        </ThemedView>
         </SafeAreaView>
        </SafeAreaProvider>
-  </ThemedText>
+
   );
 }
 
 
-const styles = StyleSheet.create({inputy : {
-      height : 40,
-      margin: 12,
-    borderWidth: 1,
-    borderColor : '#000',
-    padding: 10,
-    
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#f8f9fa',
+    },
+    safeArea: {
+        flex: 1,
+    },
+    innerContainer: {
+        flex: 1,
+        alignItems: 'center',
+        paddingHorizontal: 24,
+        paddingTop: 60,
+        paddingBottom: 40,
+    },
+    title: {
+        fontSize: 28,
+        fontWeight: '700',
+        marginTop : 40,
+        marginBottom: 40,
+        textAlign: 'center',
+    },
+    form: {
+        width: '100%',
+        maxWidth: 400,
+        alignSelf: 'center'
+    },
+    labels: {
+        fontSize: 15.5,
+        fontWeight: '600',
+        color: '#1f2937',
+        marginBottom: 9,
+        marginLeft: 2,
+        fontFamily : 'Arial'
+    },
+    inputs: {
+        width: '100%',
+        height: 54,
+        borderWidth: 1,
+        borderColor: '#e0e0e0',
+        borderRadius: 12,
+        paddingHorizontal: 16,
+        marginBottom: 20,
+        fontSize: 16,
+        backgroundColor: '#fff',
     },
 
-
-    container : {
-       flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    createButton: {
+        backgroundColor: '#2563eb',
+        height: 56,
+        borderRadius: 12,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 12,
     },
-
-    link : {
-       marginTop: 15,
-    paddingVertical: 15,
-    }
-  })
+    createButtonText: {
+        color: '#ffffff',
+        fontSize: 17,
+        fontWeight: '600',
+    },
+});

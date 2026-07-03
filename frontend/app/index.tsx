@@ -3,6 +3,7 @@ import { router } from "expo-router";
 import { useState } from "react";
 import { Button, TextInput, View,StyleSheet,Text } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { Header } from "@react-navigation/elements";
 import { ThemedView } from "./components/themed-view";
 import { ThemedText } from "./components/themed-text";
 import { Link } from 'expo-router';
@@ -29,9 +30,11 @@ export default function LoginScreen() {
 
 
   return (
-    <ThemedView >
+    
    <SafeAreaProvider style={styles.container}>
     <SafeAreaView>
+      <ThemedView >
+        <Header title="Log in" headerStyle={styles.naglowek}></Header>
       <label>Login</label>
       <TextInput value={login} onChangeText={val => setLogin(val)}  style={styles.inputy}></TextInput>
       <label>Hasło</label>
@@ -42,18 +45,14 @@ export default function LoginScreen() {
         title="Zaloguj"
         onPress={()=> sprawdzHaslo()}
       />
-         <Link href="/rejestracja" dismissTo style={styles.link}>
-        <ThemedText type="link">Nie masz konta?</ThemedText>
+         <Link href="/rejestracja" dismissTo style={styles.link}> 
+        <ThemedText>Nie masz konta? <ThemedText type="link">Zaloz konto</ThemedText> </ThemedText>
       </Link>
+      </ThemedView>
     </SafeAreaView>
    </SafeAreaProvider>
  
-   {/*  <Button
-        title="Zaloguj"
-        onPress={() => router.replace("/home")}
-      />
-      */}
-    </ThemedView>
+
 
 
   );
@@ -66,6 +65,9 @@ export default function LoginScreen() {
     borderColor : '#000',
     padding: 10,
     
+    },
+    naglowek : {
+
     },
 
 
