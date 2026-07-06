@@ -1,27 +1,46 @@
 import { Tabs } from "expo-router";
-import { View ,Text,Image, FlatList,StyleSheet} from "react-native";
+import { View ,Text,Image, FlatList,StyleSheet,Platform} from "react-native";
 import  {useState,useEffect} from "react"
 import dane from  "../dane.json"
-
+import { ThemedText } from "@/components/themed-text";
+import { SymbolView } from "expo-symbols";
+import { MaterialIcons } from "@expo/vector-icons";
 export default function User() {
   const [katalog,setKatalog] = useState(dane)
   const kategorieMap = new Map();
-  kategorieMap.set("Komputery i monitory",1)
-  kategorieMap.set("Smartfony i tablety",2)
-  kategorieMap.set("Drukarki i skanery",3)
-  kategorieMap.set("Audio i video",4)
-  kategorieMap.set("Projektory i prezentacje",5)
-  kategorieMap.set("Pamięci masowe",6)
-  kategorieMap.set("Sieć i internet",7)
-  kategorieMap.set("Akcesoria komputerowe",8)
-  kategorieMap.set("Zasilanie i akcesoria",9)
+  kategorieMap.set(1,"Buty")
+  kategorieMap.set(2,"Elektronika")
+  kategorieMap.set(3,"Narzedzia")
+  kategorieMap.set(4,"Sport i rekreacja")
+    const [ikonki,setIkonki] = useState<any[]>([])
 
-
+ useEffect(() => {
+    fetch("https://wypozyczalnia.calantris.com/cos.json")
+      .then((response) => response.json())
+      .then((data) => {console.log("IKONKI Z API:", data);
+ setIkonki(data)})
+      .catch((err) => console.log(err));
+  }, [])
 
   const path = "wypozyczalnia.calantris.com/"
   return (
     <View style={{ flex: 1, padding: 10 }}>
-<FlatList
+     {/*głowny styl katalogu jako siatka np */}
+     <View> 
+        <ThemedText>KATALOG</ThemedText>
+        <ThemedText>Wyszukaj ....</ThemedText>
+                {/*search bar */}
+        {/*głowny styl katalogu  */}
+      <View>
+        <ThemedText>KATEGORIE</ThemedText>
+        <View>
+          {/*kontener dla kategorii  */}
+          
+        {Array.from(kategorieMap).map(([key,val])=> (<ThemedText key={key}>{val}</ThemedText>))}
+        </View>
+      </View>
+
+    <FlatList
       data={dane}
       keyExtractor={(item) => item.id.toString()}
       renderItem={({ item }) => (
@@ -40,6 +59,8 @@ export default function User() {
         </View>
       )}
     />
+
+</View>
     </View>
   );
   
