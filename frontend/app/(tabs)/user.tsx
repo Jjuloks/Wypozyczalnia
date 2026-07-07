@@ -449,4 +449,106 @@ const styles = StyleSheet.create({
     height: 240,
     zIndex: 2,
   },
+   sectionHeader: {
+    marginTop: 34,
+    marginBottom: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+
+  sectionTitle: {
+    fontSize: 24,
+    fontWeight: "900",
+    color: "#111827",
+  },
+
+  sectionActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+
+  allButton: {
+    height: 38,
+    paddingHorizontal: 18,
+    borderRadius: 12,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  allButtonText: {
+    fontSize: 14,
+    fontWeight: "800",
+    color: "#111827",
+  },
+
+  arrowButton: {
+    width: 38,
+    height: 38,
+    borderRadius: 12,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  categoriesRow: {
+    width: "100%",
+    flexDirection: "row",
+    gap: 16,
+  },
+
+  categoryCard: {
+    flex: 1,
+    minHeight: 118,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: "#E8EEF7",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 14,
+
+    shadowColor: "#0F172A",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.04,
+    shadowRadius: 16,
+    elevation: 3,
+  },
+
+  categoryCardActive: {
+    backgroundColor: "#FFEAF0",
+    borderColor: "#FFD0DC",
+  },
+
+  categoryIconBox: {
+    width: 54,
+    height: 54,
+    borderRadius: 18,
+    backgroundColor: "#EEF6FF",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 12,
+  },
+
+  categoryIconBoxActive: {
+    backgroundColor: "#FFFFFF",
+  },
+
+  categoryName: {
+    fontSize: 15,
+    fontWeight: "800",
+    color: "#111827",
+    textAlign: "center",
+  },
+
+  categoryNameActive: {
+    color: "#F43F5E",
+  },
+
 });
