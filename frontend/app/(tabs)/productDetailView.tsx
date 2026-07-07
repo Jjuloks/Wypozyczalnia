@@ -92,27 +92,38 @@ export default function TabsLayout() {
    
        </View>
 
-    <View style={styles.category}>
-        <View style={styles.category_path}> 
-         <Pressable style={styles.seeAllButton}>
-          <MaterialIcons name="home" size={22} color="#176BDE" />
-        </Pressable>
+    <View>
+        <View style={styles.category_path}>
+            {/*przenoszenie do odpowiedniej kategorii */}
+    <Pressable style={styles.breadcrumbItem} onPress={() => {}}>
+      <MaterialIcons name="home" size={20} color="#176BDE" />
+    </Pressable>
 
-       <Pressable style={styles.seeAllButton}>
-          <Text style={styles.seeAllText}>Elektornika</Text>
-          <MaterialIcons name="chevron-right" size={22} color="#176BDE" />
-        </Pressable>
+    {/* Separator */}
+    <MaterialIcons name="chevron-right" size={18} color="#176BDE" />
 
-        <Pressable style={styles.seeAllButton}>
-          <Text style={styles.seeAllText}>Laptopy</Text>
-          <MaterialIcons name="chevron-right" size={22} color="#176BDE" />
-        </Pressable>
+       {/*przenoszenie do odpowiedniej kategorii-> Elektronika np. */}
+    <Pressable style={styles.breadcrumbItem} onPress={() => {}}>
+      <Text style={styles.breadcrumbText}>Elektronika</Text>
+    </Pressable>
 
-           <Pressable style={styles.seeAllButton}>
-          <Text style={styles.seeAllText}>Laptop dell</Text>
-        </Pressable>
+    {/* Separator */}
+    <MaterialIcons name="chevron-right" size={18} color="#176BDE" />
 
-        </View>
+    {/* Kategoria podrzedna */}
+    <Pressable style={styles.breadcrumbItem} onPress={() => {}}>
+      <Text style={styles.breadcrumbText}>Laptopy</Text>
+    </Pressable>
+
+    {/* Separator */}
+    <MaterialIcons name="chevron-right" size={18} color="#176BDE" />
+
+    {/* Ostatnie aktywny element */}
+    <Pressable style={styles.breadcrumbItem} onPress={() => {}}>
+      <Text style={styles.breadcrumbLast}>Laptop Dell Latitude 5420</Text>
+    </Pressable>
+</View>
+     
     </View>
 
     </View>
@@ -175,5 +186,27 @@ const styles = StyleSheet.create({
         fontSize: 15,
         color: "#111827",
         outlineStyle: "none" as any,
-    }
+    },
+    category_path: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        flexWrap: 'nowrap',           
+        overflow: 'hidden',           
+    },
+    breadcrumbItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: 2,
+    },
+    breadcrumbText: {
+        fontSize: 14,
+        color: '#176BDE',
+        fontWeight: '500',
+        marginRight: 4,
+    },
+    breadcrumbLast: {
+        fontSize: 14,
+        color: '#1F2937',
+        fontWeight: '600',
+    },
 })
