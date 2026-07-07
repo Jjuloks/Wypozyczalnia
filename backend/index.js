@@ -6,6 +6,7 @@ const port = 3000;
 import authSession from './auth/sessions.js'
 import items from './katalog/items.js'
 import kategorie from './katalog/kategorie.js'
+import accounts from './accounts/accounts.js'
 import { pool } from './db/pool.js';
 import cookieParser from 'cookie-parser';
 
@@ -35,6 +36,7 @@ app.get("/", async (req, res) => {
 app.use("/auth", authSession)
 app.use("/items", items)
 app.use("/kategorie", kategorie)
+app.use("/account", accounts)
 
 app.listen(port, async () => {
     console.log(`Przykładowa apka na porcie ${port}`)
