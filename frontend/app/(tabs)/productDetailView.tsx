@@ -4,10 +4,11 @@ import { ThemedText } from "@/components/themed-text";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useState } from "react";
 import { TextInput } from "react-native";
-import { Pressable } from "react-native";
+import { Pressable,Image } from "react-native";
 import { router } from "expo-router";
 export default function TabsLayout() {
     const [searchText,setsearchText] = useState("")
+    const temp_photoso = [{id : 0 , zdjecie_url : "https://wypozyczalnia.calantris.com/projektor.jpg"}]
   return (
    
 
@@ -38,29 +39,29 @@ export default function TabsLayout() {
        </View>
         {/*KONTROLKI -> KATEGORIE, KONTAKT, DLA FIRM , JAK TO DZIALA */}
 
-        <View style={styles.headerSideActions}>
-          <Pressable style={styles.headerInfo} >
-            <Text style={styles.headerInfoText}>Kategorie</Text>
+        <View style={styles.sideheaderActions}>
+          <Pressable style={styles.sideheaderAction} >
+            <Text style={styles.sideheaderText}>Kategorie</Text>
           </Pressable>
        </View>
 
 
         
-        <View style={styles.headerSideActions}>
-          <Pressable style={styles.headerInfo} >
-            <Text style={styles.headerInfoText}>Jak to działa?</Text>
+        <View style={styles.sideheaderActions}>
+          <Pressable style={styles.sideheaderAction} >
+            <Text style={styles.sideheaderText}>Jak to działa?</Text>
           </Pressable>
        </View>
 
-        <View style={styles.headerSideActions}>
-          <Pressable style={styles.headerInfo} >
-            <Text style={styles.headerInfoText}>Dla firm</Text>
+        <View style={styles.sideheaderActions}>
+          <Pressable style={styles.sideheaderAction} >
+            <Text style={styles.sideheaderText}>Dla firm</Text>
           </Pressable>
        </View>
 
-        <View style={styles.headerSideActions}>
-          <Pressable style={styles.headerInfo} >
-            <Text style={styles.headerInfoText}>Kontakt</Text>
+        <View style={styles.sideheaderActions}>
+          <Pressable style={styles.sideheaderAction} >
+            <Text style={styles.sideheaderText}>Kontakt</Text>
           </Pressable>
        </View>
 
@@ -124,6 +125,38 @@ export default function TabsLayout() {
     </Pressable>
 </View>
      
+    </View>
+
+    <View style={styles.galleryCard}>
+       <View style={styles.productLayout}>
+        <View style={styles.imageCounter}>
+            <Text style={styles.imageCounterText}>
+                {/* ilosc zdjec na ile */}
+                1 / 6
+            </Text>
+        </View>
+
+        {/* COFNIECIE ZDJECIA*/}
+        <Pressable>
+      <MaterialIcons name="chevron-left" size={28} color="#0F172A" />
+
+
+    <View style={styles.mainImageBox}>
+      <Image
+        source={{ uri: temp_photoso[0].zdjecie_url }}
+        style={styles.mainProductImage}
+        resizeMode="contain"
+      />
+    </View>
+
+    </Pressable>
+           {/* KOLEJNE ZDJECIE*/}
+       <Pressable>
+      <MaterialIcons name="chevron-right" size={28} color="#0F172A" />
+    </Pressable>
+
+
+       </View>
     </View>
 
     </View>
@@ -209,4 +242,83 @@ const styles = StyleSheet.create({
         color: '#1F2937',
         fontWeight: '600',
     },
+    headerActions: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 22,
+  },
+
+    headerAction: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 7,
+  },
+
+    headerActionText: {
+            fontSize: 14,
+            fontWeight: "700",
+            color: "#111827",
+    },
+    scroll: {
+        flex: 1,
+    },
+
+  scrollContent: {
+    paddingBottom: 60,
+  },
+    galleryCard: {
+    width: "100%",
+    marginTop: 24,
+    flexDirection: "row",
+    gap: 24,
+    },
+
+    productLayout: {
+    flex: 1.65,
+    minHeight: 720,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 26,
+    padding: 28,
+    position: "relative",
+
+    shadowColor: "#0F172A",
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.06,
+    shadowRadius: 24,
+    elevation: 5,
+    },
+
+    mainImageBox: {
+    flex: 1,
+    minHeight: 520,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 56,
+    paddingTop: 30,
+    paddingBottom: 30,
+    },
+
+    mainProductImage: {
+    width: "100%",
+    height: "100%",
+    maxHeight: 520,
+    },
+
+    imageCounter: {
+    position: "absolute",
+    top: 26,
+    right: 28,
+    zIndex: 10,
+    backgroundColor: "#F1F5F9",
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 999,
+    },
+
+    imageCounterText: {
+    fontSize: 14,
+    fontWeight: "800",
+    color: "#64748B",
+    },
+
 })
