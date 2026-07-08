@@ -1,15 +1,18 @@
 
 import { router } from "expo-router";
-import { useState } from "react";
-import { Button, TextInput, View,StyleSheet,Text,TouchableOpacity, Image, Platform, useWindowDimensions, ScrollView } from "react-native";
+import { useRef, useState } from "react";
+import { Button, TextInput, View,StyleSheet,Text,TouchableOpacity, Image, Platform, useWindowDimensions, ScrollView, KeyboardAvoidingView } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { Header } from "@react-navigation/elements";
 import { ThemedView } from "./components/themed-view";
 import { ThemedText } from "./components/themed-text";
 import { Link } from 'expo-router';
+import { Ionicons } from "@expo/vector-icons";
 
 export default function LoginScreen() {
 
+  const { width } = useWindowDimensions()
+  const scrollRef = useRef<ScrollView>(null)
   const [adresEmail,setadresEmail] =  useState("")
   const [haslo,setHaslo] = useState("")
   const testLogin = "admin"
@@ -28,6 +31,138 @@ export default function LoginScreen() {
       alert('Login lub haslo jest nieprawidlowe')
     }
     
+  }
+
+  const scrollToLoginForm = (offset: number) => {
+    setTimeout(() => {
+      scrollRef.current?.scrollTo({ y: offset, animated: true })
+    }, 80)
+  }
+
+  if(Platform.OS !== "web"){
+    const mobileWidth = Math.min(width, 430)
+    const heroImageWidth = mobileWidth * 0.92
+    const heroImageHeight = heroImageWidth * 1.333
+    const heroFrameHeight = heroImageHeight * 0.86
+
+    return (
+      <SafeAreaProvider style={mobileStyles.container}>
+        <SafeAreaView style={mobileStyles.safeArea}>
+          <KeyboardAvoidingView
+            style={mobileStyles.keyboardAvoidingView}
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            keyboardVerticalOffset={0}
+          >
+            <ScrollView
+              ref={scrollRef}
+              style={mobileStyles.scrollView}
+              contentContainerStyle={mobileStyles.scrollContent}
+              showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
+              keyboardDismissMode={Platform.OS === "ios" ? "interactive" : "on-drag"}
+              automaticallyAdjustKeyboardInsets={true}
+            >
+            <View style={[mobileStyles.mobilePage, { maxWidth: mobileWidth }]}>
+              <View style={[mobileStyles.mobileHero, { height: heroFrameHeight }]}>
+                <Image
+                  source={require("../assets/logos/rentil_im.png")}
+                  style={[
+                    mobileStyles.mobileHeroImage,
+                    {
+                      width: heroImageWidth,
+                      height: heroImageHeight,
+                    }
+                  ]}
+                  resizeMode="contain"
+                />
+              </View>
+
+              <View style={mobileStyles.loginCard}>
+                <Text style={mobileStyles.mobileTitle}>Zaloguj się</Text>
+
+                <View style={mobileStyles.mobileForm}>
+                  <Text style={mobileStyles.mobileLabel}>Adres e-mail</Text>
+                  <View style={mobileStyles.mobileInputWrapper}>
+                    <Ionicons name="mail-outline" size={20} color="#7B88A4" />
+                    <TextInput
+                      value={adresEmail}
+                      onChangeText={val => setadresEmail(val)}
+                      style={mobileStyles.mobileInput}
+                      placeholder="Wprowadź adres e-mail"
+                      placeholderTextColor="#94A3B8"
+                      autoCapitalize="none"
+                      keyboardType="email-address"
+                      onFocus={() => scrollToLoginForm(Math.max(150, heroFrameHeight - 54))}
+                    />
+                  </View>
+
+                  <Text style={mobileStyles.mobileLabel}>Hasło</Text>
+                  <View style={mobileStyles.mobileInputWrapper}>
+                    <Ionicons name="lock-closed-outline" size={20} color="#7B88A4" />
+                    <TextInput
+                      secureTextEntry={true}
+                      value={haslo}
+                      onChangeText={val => setHaslo(val)}
+                      style={mobileStyles.mobileInput}
+                      placeholder="Wprowadź hasło"
+                      placeholderTextColor="#94A3B8"
+                      onFocus={() => scrollToLoginForm(Math.max(190, heroFrameHeight - 18))}
+                    />
+                    <Ionicons name="eye-outline" size={20} color="#7B88A4" />
+                  </View>
+
+                  <View style={mobileStyles.mobileOptions}>
+                    <TouchableOpacity style={mobileStyles.mobileRememberRow} activeOpacity={0.75}>
+                      <View style={mobileStyles.mobileCheckbox} />
+                      <Text style={mobileStyles.mobileRememberText} numberOfLines={1} adjustsFontSizeToFit>Zapamiętaj mnie</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity activeOpacity={0.75}>
+                      <Text style={mobileStyles.mobileForgotPassword} numberOfLines={1} adjustsFontSizeToFit>Nie pamiętasz hasła?</Text>
+                    </TouchableOpacity>
+                  </View>
+
+                  <TouchableOpacity style={mobileStyles.mobileLoginButton} onPress={sprawdzHaslo} activeOpacity={0.86}>
+                    <Text style={mobileStyles.mobileLoginButtonText}>Zaloguj się</Text>
+                  </TouchableOpacity>
+                </View>
+
+                <View style={mobileStyles.mobileDivider}>
+                  <View style={mobileStyles.mobileDividerLine} />
+                  <Text style={mobileStyles.mobileDividerText}>lub kontynuuj przez</Text>
+                  <View style={mobileStyles.mobileDividerLine} />
+                </View>
+
+                <View style={mobileStyles.mobileSocialContainer}>
+                  <TouchableOpacity style={mobileStyles.mobileSocialButton} activeOpacity={0.75}>
+                    <Image source={require('../assets/icons/google-icon.png')} style={mobileStyles.mobileSocialIcon} resizeMode="contain" />
+                    <Text style={mobileStyles.mobileSocialText}>Google</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity style={mobileStyles.mobileSocialButton} activeOpacity={0.75}>
+                    <Image source={require('../assets/icons/facebook-icon.png')} style={mobileStyles.mobileSocialIcon} resizeMode="contain" />
+                    <Text style={mobileStyles.mobileSocialText}>Facebook</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity style={mobileStyles.mobileSocialButton} activeOpacity={0.75}>
+                    <Image source={require('../assets/icons/apple-icon.png')} style={mobileStyles.mobileSocialIcon} resizeMode="contain" />
+                    <Text style={mobileStyles.mobileSocialText}>Apple</Text>
+                  </TouchableOpacity>
+                </View>
+
+                <Link href="/rejestracja" dismissTo style={mobileStyles.mobileLink}>
+                  <Text style={mobileStyles.mobileLinkText}>
+                    Nie masz jeszcze konta?{" "}
+                    <Text style={mobileStyles.mobileLinkTextBlue}>Zarejestruj się</Text>
+                  </Text>
+                </Link>
+              </View>
+            </View>
+            </ScrollView>
+          </KeyboardAvoidingView>
+        </SafeAreaView>
+      </SafeAreaProvider>
+    );
   }
 
 
@@ -145,7 +280,7 @@ export default function LoginScreen() {
   );
 };
 
-const styles = StyleSheet.create({
+const desktopStyles = StyleSheet.create({
     container: {
       flex: 1,
       backgroundColor: '#f8fafc',
@@ -390,6 +525,219 @@ const styles = StyleSheet.create({
 
 
 });
+
+const mobileStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#F4F8FF",
+  },
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#F4F8FF",
+  },
+  keyboardAvoidingView: {
+    flex: 1,
+  },
+  scrollView: {
+    flex: 1,
+    backgroundColor: "#F4F8FF",
+  },
+  scrollContent: {
+    flexGrow: 1,
+    alignItems: "center",
+    justifyContent: "flex-start",
+    paddingBottom: 18,
+  },
+  mobilePage: {
+    width: "100%",
+    alignSelf: "center",
+    backgroundColor: "#F4F8FF",
+  },
+  mobileHero: {
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    backgroundColor: "#EEF6FF",
+    overflow: "hidden",
+  },
+  mobileHeroImage: {
+    alignSelf: "center",
+  },
+  loginCard: {
+    marginHorizontal: 16,
+    marginTop: -15,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 22,
+    paddingHorizontal: 16,
+    paddingTop: 14,
+    paddingBottom: 14,
+    shadowColor: "#0F172A",
+    shadowOffset: { width: 0, height: 18 },
+    shadowOpacity: 0.09,
+    shadowRadius: 30,
+    elevation: 12,
+  },
+  mobileTitle: {
+    fontSize: 23,
+    lineHeight: 28,
+    fontWeight: "900",
+    color: "#071536",
+    letterSpacing: 0,
+    marginBottom: 8,
+  },
+  mobileForm: {
+    width: "100%",
+  },
+  mobileLabel: {
+    fontSize: 13,
+    lineHeight: 18,
+    fontWeight: "700",
+    color: "#0F172A",
+    marginBottom: 4,
+  },
+  mobileInputWrapper: {
+    width: "100%",
+    height: 42,
+    borderWidth: 1,
+    borderColor: "#D7DFEA",
+    borderRadius: 11,
+    backgroundColor: "#FFFFFF",
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 13,
+    marginBottom: 8,
+  },
+  mobileInput: {
+    flex: 1,
+    height: "100%",
+    color: "#0F172A",
+    fontSize: 14,
+    fontWeight: "500",
+    paddingHorizontal: 11,
+    paddingVertical: 0,
+  },
+  mobileOptions: {
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: -2,
+    marginBottom: 13,
+    gap: 8,
+  },
+  mobileRememberRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    flexShrink: 1,
+    maxWidth: "48%",
+  },
+  mobileCheckbox: {
+    width: 18,
+    height: 18,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: "#CDD7E5",
+    backgroundColor: "#FFFFFF",
+    marginRight: 7,
+  },
+  mobileRememberText: {
+    fontSize: 12,
+    lineHeight: 17,
+    color: "#66738F",
+    fontWeight: "500",
+  },
+  mobileForgotPassword: {
+    fontSize: 12,
+    lineHeight: 17,
+    color: "#2563EB",
+    fontWeight: "600",
+    textAlign: "right",
+  },
+  mobileLoginButton: {
+    width: "100%",
+    height: 44,
+    borderRadius: 12,
+    backgroundColor: "#2563EB",
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#2563EB",
+    shadowOffset: { width: 0, height: 9 },
+    shadowOpacity: 0.28,
+    shadowRadius: 18,
+    elevation: 10,
+  },
+  mobileLoginButtonText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    lineHeight: 21,
+    fontWeight: "700",
+  },
+  mobileDivider: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 12,
+    marginBottom: 10,
+    gap: 9,
+  },
+  mobileDividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: "#E2E8F0",
+  },
+  mobileDividerText: {
+    fontSize: 12,
+    lineHeight: 17,
+    color: "#94A3B8",
+    fontWeight: "500",
+  },
+  mobileSocialContainer: {
+    width: "100%",
+    flexDirection: "row",
+    gap: 7,
+    marginBottom: 10,
+  },
+  mobileSocialButton: {
+    flex: 1,
+    minWidth: 0,
+    height: 40,
+    borderRadius: 10,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#DDE5F0",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 4,
+  },
+  mobileSocialIcon: {
+    width: 18,
+    height: 18,
+    marginRight: 4,
+  },
+  mobileSocialText: {
+    fontSize: 11,
+    lineHeight: 15,
+    fontWeight: "600",
+    color: "#1E293B",
+  },
+  mobileLink: {
+    alignItems: "center",
+    textAlign: "center",
+  },
+  mobileLinkText: {
+    fontSize: 14,
+    lineHeight: 19,
+    color: "#7B88A4",
+    fontWeight: "500",
+    textAlign: "center",
+  },
+  mobileLinkTextBlue: {
+    color: "#2563EB",
+    fontWeight: "700",
+  },
+});
+
+const styles = desktopStyles;
 
     
     
