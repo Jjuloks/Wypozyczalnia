@@ -9,9 +9,48 @@ import { useState } from 'react';
 export default function ProductDetailedView () {
     const [searchText,setsearchText] = useState("")
     const { id } = useLocalSearchParams();
-    const [aktualneZdjecie,setaktualneZdjecie] = useState(1)
+    const [indexaktualneZdjecie,setindexaktualneZdjecie] = useState(0)
+   
     {/* Produkt o danym id */}
     const product = dane.find((item)=> item.id.toString() === id)
+
+
+    {/* tymczasowa galeria zdjec, narazie mam jedno zdjecie (potem bedzie wiele) */}
+    const temp_photos_gallery = [
+        product?.zdjecie_url, 
+        product?.zdjecie_url,
+        product?.zdjecie_url,
+        product?.zdjecie_url,
+        product?.zdjecie_url,
+        product?.zdjecie_url
+    ]
+
+    if (!product) {
+        return (
+        <View style={styles.screen}>
+            <Text style={styles.errorText}>Nie znaleziono produktu.</Text>
+        </View>
+        );
+  }
+
+  const przejdzDoNastepnegoZdjecia =()=> {
+    let nowy_index = indexaktualneZdjecie +1;
+    if(nowy_index >= temp_photos_gallery.length ){
+    
+        nowy_index = 0
+    }
+    setindexaktualneZdjecie(nowy_index)
+  }
+
+  const przejdzDoPoprzedniegoZdjecia =()=>{
+     let nowy_index = indexaktualneZdjecie -1;
+       if(nowy_index < 0){
+        nowy_index = 5
+    }
+    setindexaktualneZdjecie(nowy_index)
+  }
+
+
   return (
    
     <View style={screen}>
@@ -129,36 +168,55 @@ export default function ProductDetailedView () {
      
     </View>
 
-    <View style={styles.galleryCard}>
-       <View style={styles.productLayout}>
+    <View style={styles.productSection}>
+       <View style={styles.galleryCard}>
         <View style={styles.imageCounter}>
             <Text style={styles.imageCounterText}>
                 {/* ilosc zdjec na ile */}
-                1 / 6
+                 {indexaktualneZdjecie + 1} / {temp_photos_gallery.length}
             </Text>
         </View>
 
         {/* COFNIECIE ZDJECIA*/}
-        <Pressable>
+        <Pressable onPress={()=> przejdzDoPoprzedniegoZdjecia()}>
       <MaterialIcons name="chevron-left" size={28} color="#0F172A" />
-
+</Pressable>
 
     <View style={styles.mainImageBox}>
       <Image
-        source={{ uri: product?.zdjecie_url }}
+        source={{ uri: temp_photos_gallery[indexaktualneZdjecie] }}
         style={styles.mainProductImage}
         resizeMode="contain"
       />
     </View>
 
-    </Pressable>
+   
            {/* KOLEJNE ZDJECIE*/}
-       <Pressable>
+       <Pressable onPress={()=> przejdzDoNastepnegoZdjecia()}>
       <MaterialIcons name="chevron-right" size={28} color="#0F172A" />
     </Pressable>
 
-
+    <View style={styles.thumbnailRow}>
+                {temp_photos_gallery.map((image, index) => (
+                  <Pressable
+                    key={index}
+                    style={[
+                      styles.thumbnailBox,
+                      indexaktualneZdjecie === index && styles.thumbnailBoxActive,
+                    ]}
+                    onPress={() => setindexaktualneZdjecie(index)}
+                  >
+                    <Image
+                      source={{ uri: image }}
+                      style={styles.thumbnailImage}
+                      resizeMode="contain"
+                    />
+                  </Pressable>
+                ))}
+              </View>
        </View>
+    {/* PRAWA STRONA - SZCZEGOLY */}
+    
     </View>
 
     </View>
