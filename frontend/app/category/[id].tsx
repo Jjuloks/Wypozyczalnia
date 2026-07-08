@@ -11,7 +11,7 @@ export default function TabsLayout() {
    
 
     <View>
-      <FlatList data={dane} keyExtractor={(item)=>item.id.toString()}  numColumns={4} scrollEnabled={false} renderItem={({item})=> (
+      <FlatList data={selected_category} keyExtractor={(item)=>item.id.toString()}  numColumns={4} scrollEnabled={false} renderItem={({item})=> (
 
         <View>
             <ThemedText>{item.id}</ThemedText>
