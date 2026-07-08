@@ -9,6 +9,7 @@ import kategorie from './katalog/kategorie.js'
 import accounts from './accounts/accounts.js'
 import ulubione from './actions/ulubione.js'
 import wypozyczenia from './actions/wypozyczanie.js'
+import recenzjeRouter from './routes/recenzje.js'
 import { pool } from './db/pool.js';
 import cookieParser from 'cookie-parser';
 
@@ -41,6 +42,7 @@ app.use("/kategorie", kategorie)
 app.use("/account", accounts)
 app.use("/ulubione", ulubione)
 app.use("/wypozyczenia", wypozyczenia)
+app.use("/recenzje", recenzjeRouter)
 
 app.listen(port, "0.0.0.0", async () => {
     console.log(`Przykładowa apka na porcie ${port}`)
