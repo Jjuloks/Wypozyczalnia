@@ -17,12 +17,18 @@ CREATE TYPE status_wypozyczenia AS ENUM (
     'zwrocony'
 );
 
+CREATE TYPE status_recenzji AS ENUM (
+    'aktywna',
+    'ukryta',
+    'usunieta'
+);
+
 CREATE TABLE uzytkownicy (
     id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     imie VARCHAR(100) NOT NULL,
     nazwisko VARCHAR(100) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
-    haslo_hash TEXT NOT NULL, 
+    haslo_hash TEXT NOT NULL,
     rola typ_konta NOT NULL DEFAULT 'uzytkownik',
     data_utworzenia TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -46,7 +52,7 @@ CREATE TABLE sprzety (
     status status_sprzetu NOT NULL DEFAULT 'dostepny',
     data_dodania TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT fk_sprzet_kategorie 
+    CONSTRAINT fk_sprzet_kategorie
         FOREIGN KEY (kategoria_id)
         REFERENCES kategorie(id)
         ON DELETE RESTRICT,
@@ -56,7 +62,7 @@ CREATE TABLE sprzety (
 
     CONSTRAINT chk_sprzety_cena_po_promocji
         CHECK (
-            cena_po_promocji IS NULL 
+            cena_po_promocji IS NULL
             OR cena_po_promocji >= 0
         ),
 
@@ -65,7 +71,7 @@ CREATE TABLE sprzety (
 
     CONSTRAINT chk_sprzety_promocja_mniejsza_od_ceny
         CHECK (
-            cena_po_promocji IS NULL 
+            cena_po_promocji IS NULL
             OR cena_po_promocji <= cena
         )
 );
@@ -80,11 +86,11 @@ CREATE TABLE wypozyczenia (
     status status_wypozyczenia NOT NULL DEFAULT 'oczekujacy',
     data_zwrotu_rzeczywista TIMESTAMP,
 
-    CONSTRAINT fk_wypozyczenia_sprzet 
+    CONSTRAINT fk_wypozyczenia_sprzet
         FOREIGN KEY (sprzet_id)
         REFERENCES sprzety(id)
         ON DELETE RESTRICT,
-    
+
     CONSTRAINT fk_wypozyczenia_uzytkownicy
         FOREIGN KEY (uzytkownik_id)
         REFERENCES uzytkownicy(id)
@@ -118,7 +124,7 @@ CREATE TABLE powiadomienia (
     id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     uzytkownik_id INTEGER NOT NULL,
     tresc TEXT NOT NULL,
-    przeczytane BOOL NOT NULL DEFAULT FALSE,
+    przeczytane BOOLEAN NOT NULL DEFAULT FALSE,
     data TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT fk_powiadomienia_uzytkownicy
@@ -139,4 +145,39 @@ CREATE TABLE sesje (
         FOREIGN KEY (uzytkownik_id)
         REFERENCES uzytkownicy(id)
         ON DELETE CASCADE
+);
+
+CREATE TABLE recenzje (
+    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+
+    uzytkownik_id INTEGER NOT NULL,
+    sprzet_id INTEGER NOT NULL,
+    wypozyczenie_id INTEGER,
+
+    gwiazdki INTEGER NOT NULL,
+    tresc TEXT,
+
+    status status_recenzji NOT NULL DEFAULT 'aktywna',
+    data_dodania TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_recenzje_uzytkownicy
+        FOREIGN KEY (uzytkownik_id)
+        REFERENCES uzytkownicy(id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_recenzje_sprzety
+        FOREIGN KEY (sprzet_id)
+        REFERENCES sprzety(id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_recenzje_wypozyczenia
+        FOREIGN KEY (wypozyczenie_id)
+        REFERENCES wypozyczenia(id)
+        ON DELETE SET NULL,
+
+    CONSTRAINT chk_recenzje_gwiazdki
+        CHECK (gwiazdki >= 1 AND gwiazdki <= 5),
+
+    CONSTRAINT uq_recenzje_uzytkownik_sprzet
+        UNIQUE (uzytkownik_id, sprzet_id)
 );
