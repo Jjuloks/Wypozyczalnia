@@ -788,7 +788,21 @@ const styles = StyleSheet.create({
     color: "#111827",
     marginBottom: 4,
   },
+  productStatusBadge: {
+    alignSelf: "flex-start",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 999,
+    marginBottom: 8,
+  },
 
+  productStatusText: {
+    fontSize: 12,
+    fontWeight: "800",
+  },
   productDescription: {
     fontSize: 13,
     lineHeight: 18,
