@@ -7,6 +7,38 @@ import { ThemedText } from '@/components/themed-text';
 import { useState } from 'react';
 
 export default function ProductDetailedView () {
+  {/*STATUSY */}
+    type StatusSprzetu = "dostepny" | "wypozyczony" | "w_naprawie";
+
+    type StatusStyle = {
+    label: string;
+    backgroundColor: string;
+    textColor: string;
+    icon: keyof typeof MaterialIcons.glyphMap;
+    };
+
+    const statusStyles: Record<StatusSprzetu, StatusStyle> = {
+    dostepny: {
+      label: "Dostępny",
+      backgroundColor: "#DCFCE7",
+      textColor: "#166534",
+      icon: "check-circle",
+    },
+    wypozyczony: {
+      label: "Wypożyczony",
+      backgroundColor: "#DBEAFE",
+      textColor: "#1E40AF",
+      icon: "hourglass-empty",
+    },
+    w_naprawie: {
+      label: "W naprawie",
+      backgroundColor: "#FEF3C7",
+      textColor: "#92400E",
+      icon: "build",
+    },
+    };
+
+
     const [searchText,setsearchText] = useState("")
     const { id } = useLocalSearchParams();
     const [indexaktualneZdjecie,setindexaktualneZdjecie] = useState(0)
@@ -225,9 +257,34 @@ export default function ProductDetailedView () {
         <Text style={styles.productTitle}>{product.nazwa}</Text>
           <View style={styles.statusRow}>
                 <View style={styles.statusDot} />
-            <Text style={styles.statusText}>
-                  {product.status}
-            </Text>
+            
+                  <View
+                        style={[
+                          styles.productStatusBadge,
+                          {
+                            backgroundColor:
+                              statusStyles[product.status as keyof typeof statusStyles].backgroundColor,
+                          },
+                        ]}
+                      >
+                        <MaterialIcons
+                          name={statusStyles[product.status as keyof typeof statusStyles].icon}
+                          size={14}
+                          color={statusStyles[product.status as keyof typeof statusStyles].textColor}
+                        />
+            
+                        <Text
+                          style={[
+                            styles.productStatusText,
+                            {
+                              color: statusStyles[product.status as keyof typeof statusStyles].textColor,
+                            },
+                          ]}
+                        >
+                          {statusStyles[product.status as keyof typeof statusStyles].label}
+                        </Text>
+                      </View>
+            
 
         {/* opinie */}
         <MaterialIcons name="star" size={18} color="#F59E0B" />
@@ -512,4 +569,19 @@ const styles = StyleSheet.create({
     right: 28,
   },
 
+  productStatusBadge: {
+    alignSelf: "flex-start",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 999,
+    marginBottom: 8,
+  },
+
+  productStatusText: {
+    fontSize: 12,
+    fontWeight: "800",
+  },
 })
