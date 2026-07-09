@@ -573,11 +573,15 @@ router.get("/", async (req, res) => {
     });
   }
 });
-async function edytujRecenzje(req, res) {
+async function ustawStatusWidocznosciRecenzji(req, res, status) {
   try {
     const uzytkownik = await pobierzZalogowanego(req, res);
 
     if (!uzytkownik) {
+      return;
+    }
+
+    if (!sprawdzAdmina(uzytkownik, res)) {
       return;
     }
 
@@ -597,81 +601,24 @@ async function edytujRecenzje(req, res) {
       });
     }
 
-    const czyAdmin = uzytkownik.rola === "admin";
-
-    if (!czyAdmin && recenzja.uzytkownik_id !== uzytkownik.id) {
-      return res.status(403).json({
-        error: "Brak uprawnien."
-      });
-    }
-
-    const body = req.body || {};
-    const pola = [];
-    const params = [];
-
-    if (czyPolePrzekazane(body, "gwiazdki")) {
-      const gwiazdki = parsujGwiazdki(body.gwiazdki);
-
-      if (!gwiazdki) {
-        return res.status(400).json({
-          error: "Nieprawidlowa liczba gwiazdek."
-        });
-      }
-
-      params.push(gwiazdki);
-      pola.push(`gwiazdki = $${params.length}`);
-    }
-
-    if (czyPolePrzekazane(body, "tresc")) {
-      params.push(normalizujTekstOpcjonalny(body.tresc));
-      pola.push(`tresc = $${params.length}`);
-    }
-
-    if (czyPolePrzekazane(body, "status")) {
-      if (!czyAdmin) {
-        return res.status(403).json({
-          error: "Brak uprawnien do zmiany statusu recenzji."
-        });
-      }
-
-      const status = normalizujTekst(body.status);
-
-      if (!dozwoloneStatusyRecenzji.includes(status)) {
-        return res.status(400).json({
-          error: "Nieprawidlowy status recenzji."
-        });
-      }
-
-      params.push(status);
-      pola.push(`status = $${params.length}::status_recenzji`);
-    }
-
-    if (pola.length === 0) {
+    if (recenzja.status === "usunieta") {
       return res.status(400).json({
-        error: "Brak danych do aktualizacji."
+        error: "Nie mozna zmienic widocznosci usunietej recenzji."
       });
     }
-
-    params.push(id);
 
     const result = await pool.query(
       `
       UPDATE recenzje
-      SET ${pola.join(", ")}
-      WHERE id = $${params.length}
+      SET status = $2::status_recenzji
+      WHERE id = $1
       RETURNING id, uzytkownik_id, sprzet_id, wypozyczenie_id, gwiazdki, tresc, status, data_dodania;
       `,
-      params
+      [id, status]
     );
 
     return res.status(200).json(mapujRecenzje(result.rows[0]));
   } catch (err) {
-    if (err.code === "23514") {
-      return res.status(400).json({
-        error: "Nieprawidlowe dane recenzji."
-      });
-    }
-
     console.error(err);
 
     return res.status(500).json({
@@ -680,8 +627,18 @@ async function edytujRecenzje(req, res) {
   }
 }
 
-router.patch("/edytuj/:id", edytujRecenzje);
-router.put("/edytuj/:id", edytujRecenzje);
+function ukryjRecenzje(req, res) {
+  return ustawStatusWidocznosciRecenzji(req, res, "ukryta");
+}
+
+function odkryjRecenzje(req, res) {
+  return ustawStatusWidocznosciRecenzji(req, res, "aktywna");
+}
+
+router.patch("/ukryj/:id", ukryjRecenzje);
+router.put("/ukryj/:id", ukryjRecenzje);
+router.patch("/odkryj/:id", odkryjRecenzje);
+router.put("/odkryj/:id", odkryjRecenzje);
 
 router.delete("/usun/:id", async (req, res) => {
   try {
@@ -700,8 +657,8 @@ router.delete("/usun/:id", async (req, res) => {
     }
 
     const recenzja = await pobierzRecenzjePoId(id);
-
-    if (!recenzja) {
+    
+    if (!recenzja || recenzja.status === 'usunieta') {
       return res.status(404).json({
         error: "Nie znaleziono recenzji."
       });
