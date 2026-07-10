@@ -1,49 +1,30 @@
+import "dotenv/config";
+import express from "express";
+import cookieParser from "cookie-parser";
+import start from "./routes/start.js";
+import authSession from "./routes/sessions.js";
+import items from "./routes/items.js";
+import kategorie from "./routes/kategorie.js";
+import accounts from "./routes/accounts.js";
+import ulubione from "./routes/ulubione.js";
+import wypozyczenia from "./routes/wypozyczenia.js";
+import recenzje from "./routes/recenzje.js";
 
-import express from 'express';
-import 'dotenv/config';
 const app = express();
 const port = 3000;
-import authSession from './auth/sessions.js'
-import items from './katalog/items.js'
-import kategorie from './katalog/kategorie.js'
-import accounts from './accounts/accounts.js'
-import ulubione from './actions/ulubione.js'
-import wypozyczenia from './actions/wypozyczanie.js'
-import recenzjeRouter from './routes/recenzje.js'
-import { pool } from './db/pool.js';
-import cookieParser from 'cookie-parser';
 
 app.use(express.json());
 app.use(cookieParser());
 
-app.get("/", async (req, res) => {
-    try {
-        const result = await pool.query(
-            `
-            SELECT id, nazwa, zdjecie_url
-            FROM kategorie
-            ORDER BY id;
-            `
-        )
+app.use("/", start);
+app.use("/auth", authSession);
+app.use("/items", items);
+app.use("/kategorie", kategorie);
+app.use("/account", accounts);
+app.use("/ulubione", ulubione);
+app.use("/wypozyczenia", wypozyczenia);
+app.use("/recenzje", recenzje);
 
-        return res.status(200).json(result.rows)
-    } catch (err) {
-        console.error(err);
-
-        return res.status(500).json({
-            error: "Blad serwera"
-        });
-    }
-})
-
-app.use("/auth", authSession)
-app.use("/items", items)
-app.use("/kategorie", kategorie)
-app.use("/account", accounts)
-app.use("/ulubione", ulubione)
-app.use("/wypozyczenia", wypozyczenia)
-app.use("/recenzje", recenzjeRouter)
-
-app.listen(port, "0.0.0.0", async () => {
-    console.log(`Przykładowa apka na porcie ${port}`)
-})
+app.listen(port, "0.0.0.0", () => {
+  console.log(`Przykladowa apka na porcie ${port}`);
+});

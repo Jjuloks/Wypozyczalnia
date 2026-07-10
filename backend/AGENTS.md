@@ -2,7 +2,7 @@
 
 ## Project Structure & Module Organization
 
-This repository is a Node.js Express backend for a tool rental system. The entry point is `index.js`, which mounts feature routers and starts the server on port `3000`. Route modules are grouped by domain: `auth/` handles sessions, `accounts/` handles account routes, `katalog/` contains item and category endpoints, and `actions/` contains favorites and rental actions. Database access is centralized in `db/pool.js` using `pg`. The database schema and seed/reference SQL live in `baza.sql`, while API behavior is documented in `ENDPOINTY.md`. There is currently no dedicated `tests/` directory.
+This repository is a Node.js Express backend for a tool rental system. The entry point is `index.js`, which mounts feature routers and starts the server on port `3000`. Route modules are grouped by domain: `auth/` handles sessions, `accounts/` handles account routes, `katalog/` contains item, category, and review endpoints, and `actions/` contains favorites and rental actions. Each domain has thin mounting routers and separate files under `endpoints/`; reusable domain logic belongs in `helpers/` or `services/`. Cross-domain helpers and session/error middleware live in `shared/`. Database access is centralized in `db/pool.js` using `pg`. The database schema and seed/reference SQL live in `baza.sql`, while API behavior is documented in `ENDPOINTY.md`. There is currently no dedicated `tests/` directory.
 
 ## Build, Test, and Development Commands
 
