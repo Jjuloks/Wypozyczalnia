@@ -7,8 +7,10 @@ import { useState } from "react";
 
 export default function TabsLayout() {
     const [tab,setTab] = useState(dane)
+    const {query} = useLocalSearchParams();
+    const searchQuery = String(query ?? "").toLowerCase();
+    const tab_filtered = tab.filter((item)=> item.nazwa.toLowerCase().includes(searchQuery))
     
-
 
   
   return (
@@ -17,7 +19,7 @@ export default function TabsLayout() {
     <View>
       {/*PASEK FILTRÓW */}
       <ThemedText> WSZYSTKO </ThemedText>
-      <FlatList data={tab} keyExtractor={(elem)=> elem.id.toString()} numColumns={4} renderItem={({item})=> (
+      <FlatList data={tab_filtered} keyExtractor={(elem)=> elem.id.toString()} numColumns={4} renderItem={({item})=> (
 
 
         <View>

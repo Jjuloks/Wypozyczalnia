@@ -18,6 +18,8 @@ export default function User() {
   const [searchText,setsearchText] = useState("")
   const [randomIndex,setRandomIndex] = useState(0)
 
+  
+
   {/*statusy Sprzetu */}
   type StatusSprzetu = "dostepny" | "wypozyczony" | "w_naprawie";
 
@@ -58,7 +60,11 @@ export default function User() {
   kategorieMap.set(4,"Sport i rekreacja")
 
 
- 
+  const handleSearchSubmit =()=> {
+    const query = searchText.trim()
+
+    router.push({pathname : "../catalog/catalog", params : {query : searchText} })
+  }
 
 
   const calculate_time_left =()=> {
@@ -126,6 +132,8 @@ export default function User() {
             value={searchText}
             onChangeText={(val) => setsearchText(val)}
             style={styles.searchText}
+            returnKeyType="search"
+           onSubmitEditing={handleSearchSubmit}
             placeholder="Wyszukaj produktów, marek i kategorii"
             placeholderTextColor="#9AA4B2"
           />
