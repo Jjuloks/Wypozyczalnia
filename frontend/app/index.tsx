@@ -1,25 +1,22 @@
 
-import { router } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { Link, router } from "expo-router";
 import { useRef, useState } from "react";
 import {
-  Button,
-  TextInput,
-  View,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
-  Image,
-  Platform,
   useWindowDimensions,
-  ScrollView,
-  KeyboardAvoidingView,
+  View
 } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-import { Header } from "@react-navigation/elements";
-import { ThemedView } from "./components/themed-view";
 import { ThemedText } from "./components/themed-text";
-import { Link } from 'expo-router';
-import { Ionicons } from "@expo/vector-icons";
+import { ThemedView } from "./components/themed-view";
 
 
 export default function LoginScreen() {
@@ -157,7 +154,6 @@ export default function LoginScreen() {
                   <View style={mobileStyles.mobileDividerLine} />
                 </View>
 
-                {/* LOGOWANIE PRZEZ SOCIAL MEDIA */
                 <View style={mobileStyles.mobileSocialContainer}>
                   <TouchableOpacity style={mobileStyles.mobileSocialButton} activeOpacity={0.75}>
                     <Image source={require('../assets/icons/google-icon.png')} style={mobileStyles.mobileSocialIcon} resizeMode="contain" />
@@ -210,8 +206,7 @@ export default function LoginScreen() {
 
           {/* PRAWA STRONA */}
           <ThemedView style={styles.innerContainer}>
-            {/* FORMULARZ LOGOWANIA */
-            <View style={styles.card}>
+        <View style={styles.card}>
             <View style={styles.cardTop}>
                 <Image
                   source={require("../assets/logos/rentil.png")}
@@ -265,8 +260,7 @@ export default function LoginScreen() {
     </View>
 
 
-            {/* LOGOWANIE PRZEZ SOCIAL MEDIA */
-            <View style={styles.socialContainer}>
+     <View style={styles.socialContainer}>
                     <TouchableOpacity style={styles.socialButtonWrapper}> 
                     <Image source={require('../assets/icons/facebook-icon.png')} style={styles.socialIcon} resizeMode="contain">
 
