@@ -114,10 +114,144 @@ export default function TabsLayout() {
         </View>
       </View>
 
+        {/* GŁÓWNA ZAWARTOŚĆ */}
+        <View>
 
-      {/*PASEK FILTRÓW */}
-      <ThemedText> WSZYSTKO </ThemedText>
-      <FlatList data={tab_filtered} keyExtractor={(elem)=> elem.id.toString()} numColumns={4} renderItem={({item})=> (
+          {/* BREADCRUMBS */}
+          <View>
+            <ThemedText>Strona główna</ThemedText>
+            <ThemedText>›</ThemedText>
+            <ThemedText>Wszystkie produkty</ThemedText>
+          </View>
+
+
+        {/*NAGŁOWEK STRONY, OPISY ZACHECAJACE */}
+        <View>
+            <View>
+              <ThemedText>Wszystkie produkty</ThemedText>
+
+              <ThemedText>
+                Odkryj pełną ofertę tysięcy produktów dostępnych na wynajem.
+                Wybierz, porównaj i wynajmij już dziś.
+              </ThemedText>
+            </View>
+
+            <View>
+              <ThemedText>▱</ThemedText>
+
+              <View>
+                <ThemedText>Tysiące produktów</ThemedText>
+                <ThemedText>w jednym miejscu</ThemedText>
+              </View>
+            </View>
+          </View>
+
+         {/* UKŁAD KATALOGU */}
+          <View>
+            {/* LEWY PANEL KATEGORII, KATEGORIE MAPOWANE Z DANYCH , NARAZIE PRZYKŁADOWE NIE WSZYSTKO */}
+            <View>
+              <ThemedText>Kategorie</ThemedText>
+
+              <Pressable>
+                <ThemedText>▦</ThemedText>
+                <ThemedText>Wszystkie kategorie</ThemedText>
+              </Pressable>
+
+              <Pressable>
+                <ThemedText>◆</ThemedText>
+                <ThemedText>Promocje</ThemedText>
+              </Pressable>
+
+              <Pressable>
+                <ThemedText>◒</ThemedText>
+                <ThemedText>Buty</ThemedText>
+              </Pressable>
+
+              <Pressable>
+                <ThemedText>▣</ThemedText>
+                <ThemedText>Elektronika</ThemedText>
+              </Pressable>
+
+              <Pressable>
+                <ThemedText>⚒</ThemedText>
+                <ThemedText>Narzędzia</ThemedText>
+              </Pressable>
+
+              <Pressable>
+                <ThemedText>◉</ThemedText>
+                <ThemedText>Sport i rekreacja</ThemedText>
+              </Pressable>
+            </View>
+
+             {/* PRAWA CZĘŚĆ */}
+            <View>
+              {/* PANEL FILTRÓW */}
+              <View>
+                {/* GÓRNY RZĄD FILTRÓW */}
+                <View>
+                  <View>
+                    <ThemedText>Cena od</ThemedText>
+                    <TextInput placeholder="od 0 zł" />
+                  </View>
+
+                  <View>
+                    <ThemedText>Cena do</ThemedText>
+                    <TextInput placeholder="do 5000 zł" />
+                  </View>
+
+                  <View>
+                    <ThemedText>Cena min</ThemedText>
+
+                    <Pressable>
+                      <ThemedText>min. 1 dzień</ThemedText>
+                      <ThemedText>⌄</ThemedText>
+                    </Pressable>
+                  </View>
+
+                  <View>
+                    <ThemedText>Cena max</ThemedText>
+
+                    <Pressable>
+                      <ThemedText>max. 30 dni</ThemedText>
+                      <ThemedText>⌄</ThemedText>
+                    </Pressable>
+                  </View>
+
+                  <View>
+                    <ThemedText>Sortuj</ThemedText>
+
+                    <Pressable>
+                      <ThemedText>Cena rosnąco</ThemedText>
+                      <ThemedText>⌄</ThemedText>
+                    </Pressable>
+                  </View>
+
+                  <Pressable>
+                    <ThemedText>◆</ThemedText>
+                    <ThemedText>Promocja</ThemedText>
+                    <ThemedText>OFF</ThemedText>
+                  </Pressable>
+                </View>
+
+                {/* DOLNY RZĄD FILTRÓW */}
+                <View>
+                  <View>
+                    <Pressable>
+                      <ThemedText>☷</ThemedText>
+                      <ThemedText>Więcej filtrów</ThemedText>
+                    </Pressable>
+
+                    <Pressable>
+                      <ThemedText>↻</ThemedText>
+                      <ThemedText>Wyczyść filtry</ThemedText>
+                    </Pressable>
+                  </View>
+
+                  <ThemedText>Znaleziono: 120 produktów</ThemedText>
+                </View>
+              </View>
+             {/* LISTA PRODUKTÓW */}
+  <FlatList data={tab_filtered} keyExtractor={(elem)=> elem.id.toString()} numColumns={4} renderItem={({item})=> (
 
 
         <View>
@@ -131,6 +265,19 @@ export default function TabsLayout() {
 >
 
 </FlatList>
+
+              </View>
+
+
+</View>
+
+
+
+
+
+      <ThemedText> WSZYSTKO </ThemedText>
+    
+</View>
     </View>
 
   );
