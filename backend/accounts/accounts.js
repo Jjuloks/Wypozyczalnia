@@ -2,6 +2,15 @@ import { pool } from '../db/pool.js';
 import { Router } from 'express';
 import bcrypt from 'bcrypt';
 import { pobierzUzytkownikaZSesji } from "../auth/sessions.js";
+import {
+  generujKod,
+  hashujKod,
+  KOD_REJESTRACJI_WAZNY_MINUT,
+  MAKSYMALNA_LICZBA_PROB_KODU,
+  normalizujEmail
+} from '../auth/zabezpieczenia.js';
+import { wyslijMail } from '../mail/wysylkaMaili.js';
+import { mailKodRejestracji } from '../mail/formatyMaili.js';
 
 const router = Router();
 
@@ -35,6 +44,7 @@ function mapujKonto(konto) {
     nazwisko: konto.nazwisko,
     email: konto.email,
     rola: konto.rola,
+    dwuetapowe: konto.dwuetapowe,
     data_utworzenia: konto.data_utworzenia
   };
 }
@@ -91,16 +101,24 @@ router.post("/create", async (req, res) => {
   try {
     const { imie, nazwisko, email, password, haslo } = req.body || {};
     const hasloKonta = password || haslo;
+    const imieKonta = normalizujTekst(imie);
+    const nazwiskoKonta = normalizujTekst(nazwisko);
+    const emailKonta = normalizujEmail(email);
 
-    if (!email || !hasloKonta || !imie || !nazwisko) {
+    if (!emailKonta || !hasloKonta || !imieKonta || !nazwiskoKonta) {
       return res.status(400).json({
         error: "Nieprawidlowe zapytanie."
       });
     }
 
-    if (!czyPoprawnyEmail(email)) {
+    if (
+      emailKonta.length > 255 ||
+      imieKonta.length > 100 ||
+      nazwiskoKonta.length > 100 ||
+      !czyPoprawnyEmail(emailKonta)
+    ) {
       return res.status(400).json({
-        error: "Nieprawidlowy email."
+        error: "Nieprawidlowe dane konta."
       });
     }
 
@@ -114,10 +132,10 @@ router.post("/create", async (req, res) => {
       `
       SELECT email
       FROM uzytkownicy
-      WHERE email = $1
+      WHERE LOWER(email) = $1
       LIMIT 1
       `,
-      [email]
+      [emailKonta]
     );
 
     if (result.rowCount > 0) {
@@ -127,17 +145,59 @@ router.post("/create", async (req, res) => {
     }
 
     const hasloHash = await bcrypt.hash(hasloKonta, 12);
+    const kod = generujKod();
+    const kodHash = await hashujKod(kod);
+    const dataWygasniecia = new Date(
+      Date.now() + KOD_REJESTRACJI_WAZNY_MINUT * 60 * 1000
+    );
 
     await pool.query(
       `
-      INSERT INTO uzytkownicy (imie, nazwisko, email, haslo_hash)
-      VALUES ($1, $2, $3, $4)
+      INSERT INTO rejestracje_oczekujace (
+        email,
+        imie,
+        nazwisko,
+        haslo_hash,
+        kod_hash,
+        data_wygasniecia,
+        liczba_prob
+      )
+      VALUES ($1, $2, $3, $4, $5, $6, 0)
+      ON CONFLICT (email) DO UPDATE SET
+        imie = EXCLUDED.imie,
+        nazwisko = EXCLUDED.nazwisko,
+        haslo_hash = EXCLUDED.haslo_hash,
+        kod_hash = EXCLUDED.kod_hash,
+        data_wygasniecia = EXCLUDED.data_wygasniecia,
+        liczba_prob = 0,
+        data_utworzenia = NOW()
       `,
-      [imie, nazwisko, email, hasloHash]
+      [emailKonta, imieKonta, nazwiskoKonta, hasloHash, kodHash, dataWygasniecia]
     );
 
-    return res.status(201).json({
-      message: "Zarejestrowano"
+    const mail = mailKodRejestracji({
+      kod,
+      imie: imieKonta,
+      waznyMinut: KOD_REJESTRACJI_WAZNY_MINUT
+    });
+
+    try {
+      await wyslijMail({
+        do: emailKonta,
+        ...mail
+      });
+    } catch (err) {
+      console.error('Nie udalo sie wyslac kodu rejestracji:', err);
+
+      return res.status(502).json({
+        error: "Nie udalo sie wyslac kodu rejestracji. Sprobuj ponownie."
+      });
+    }
+
+    return res.status(202).json({
+      message: "Wyslano kod potwierdzajacy. Konto nie zostalo jeszcze utworzone.",
+      expires_in: KOD_REJESTRACJI_WAZNY_MINUT * 60,
+      max_attempts: MAKSYMALNA_LICZBA_PROB_KODU
     });
   } catch (err) {
     console.error(err);
@@ -175,7 +235,7 @@ router.get("/details/all", async (req, res) => {
 
     const result = await pool.query(
       `
-      SELECT id, imie, nazwisko, email, rola, data_utworzenia
+      SELECT id, imie, nazwisko, email, rola, dwuetapowe, data_utworzenia
       FROM uzytkownicy
       ${whereSql}
       ORDER BY id
@@ -223,7 +283,7 @@ router.get("/details", async (req, res) => {
 
     const result = await pool.query(
       `
-      SELECT id, imie, nazwisko, email, rola, data_utworzenia
+      SELECT id, imie, nazwisko, email, rola, dwuetapowe, data_utworzenia
       FROM uzytkownicy
       WHERE id = $1
       LIMIT 1;
@@ -280,7 +340,7 @@ router.get("/details/:id", async (req, res) => {
 
     const result = await pool.query(
       `
-      SELECT id, imie, nazwisko, email, rola, data_utworzenia
+      SELECT id, imie, nazwisko, email, rola, dwuetapowe, data_utworzenia
       FROM uzytkownicy
       WHERE ${where.join(" AND ")}
       LIMIT 1;
@@ -359,7 +419,7 @@ async function edytujKonto(req, res) {
     }
 
     if (Object.prototype.hasOwnProperty.call(body, "email")) {
-      const email = normalizujTekst(body.email);
+      const email = normalizujEmail(body.email);
 
       if (!email || email.length > 255 || !czyPoprawnyEmail(email)) {
         return res.status(400).json({
@@ -430,7 +490,7 @@ async function edytujKonto(req, res) {
       UPDATE uzytkownicy
       SET ${pola.join(", ")}
       WHERE id = $${params.length}
-      RETURNING id, imie, nazwisko, email, rola, data_utworzenia;
+      RETURNING id, imie, nazwisko, email, rola, dwuetapowe, data_utworzenia;
       `,
       params
     );
@@ -494,7 +554,7 @@ router.delete("/delete/:id", async (req, res) => {
       `
       DELETE FROM uzytkownicy
       WHERE id = $1
-      RETURNING id, imie, nazwisko, email, rola, data_utworzenia;
+      RETURNING id, imie, nazwisko, email, rola, dwuetapowe, data_utworzenia;
       `,
       [id]
     );

@@ -30,8 +30,51 @@ CREATE TABLE uzytkownicy (
     email VARCHAR(255) UNIQUE NOT NULL,
     haslo_hash TEXT NOT NULL,
     rola typ_konta NOT NULL DEFAULT 'uzytkownik',
+    dwuetapowe BOOLEAN NOT NULL DEFAULT FALSE,
     data_utworzenia TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE UNIQUE INDEX uq_uzytkownicy_email_lower
+    ON uzytkownicy (LOWER(email));
+
+CREATE TABLE rejestracje_oczekujace (
+    email VARCHAR(255) PRIMARY KEY,
+    imie VARCHAR(100) NOT NULL,
+    nazwisko VARCHAR(100) NOT NULL,
+    haslo_hash TEXT NOT NULL,
+    kod_hash TEXT NOT NULL,
+    liczba_prob INTEGER NOT NULL DEFAULT 0,
+    data_utworzenia TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    data_wygasniecia TIMESTAMP NOT NULL,
+
+    CONSTRAINT chk_rejestracje_liczba_prob
+        CHECK (liczba_prob >= 0)
+);
+
+CREATE INDEX idx_rejestracje_data_wygasniecia
+    ON rejestracje_oczekujace(data_wygasniecia);
+
+CREATE TABLE wyzwania_2fa (
+    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    challenge_hash TEXT UNIQUE NOT NULL,
+    uzytkownik_id INTEGER UNIQUE NOT NULL,
+    kod_hash TEXT NOT NULL,
+    liczba_prob INTEGER NOT NULL DEFAULT 0,
+    data_utworzenia TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    data_wygasniecia TIMESTAMP NOT NULL,
+
+    CONSTRAINT fk_wyzwania_2fa_uzytkownicy
+        FOREIGN KEY (uzytkownik_id)
+        REFERENCES uzytkownicy(id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT chk_wyzwania_2fa_liczba_prob
+        CHECK (liczba_prob >= 0)
+);
+
+CREATE INDEX idx_wyzwania_2fa_data_wygasniecia
+    ON wyzwania_2fa(data_wygasniecia);
+
 
 CREATE TABLE kategorie (
     id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,

@@ -2,7 +2,7 @@
 
 Domyślny adres lokalny: `http://localhost:3000`.
 
-Autoryzacja działa przez cookie `session_id`, ustawiane po zalogowaniu przez `POST /auth/login`. Endpointy wymagające zalogowania zwracają `401`, gdy nie ma poprawnej sesji. Endpointy administracyjne zwracają `403`, gdy użytkownik nie ma roli `admin`.
+Autoryzacja działa przez cookie `session_id`. Bez 2FA cookie jest ustawiane przez `POST /auth/login`, a z włączonym 2FA dopiero przez `POST /auth/2fa`. Endpointy wymagające zalogowania zwracają `401`, gdy nie ma poprawnej sesji. Endpointy administracyjne zwracają `403`, gdy użytkownik nie ma roli `admin`.
 
 ## Statusy w systemie
 
@@ -47,7 +47,7 @@ Zwracane pola:
 
 ### `POST /auth/login`
 
-Loguje użytkownika i ustawia cookie `session_id`.
+Sprawdza email i hasło użytkownika oraz rozpoczyna logowanie.
 
 Body:
 
@@ -58,12 +58,64 @@ Body:
 }
 ```
 
-Odpowiedź zawiera:
+Odpowiedź `200` dla logowania bez 2FA oraz odpowiedź `200` z `/auth/2fa` zawierają:
 
 * `message`
 * `user.id`
 * `user.email`
 * `user.rola`
+
+Jeśli użytkownik nie ma włączonego 2FA, endpoint zwraca `200`, tworzy sesję i ustawia cookie `session_id`.
+
+Jeśli użytkownik ma włączone 2FA, endpoint nie tworzy jeszcze sesji. Wysyła sześciocyfrowy kod na adres e-mail i zwraca `202`:
+
+```json
+{
+  "message": "Wyslano kod 2FA.",
+  "requires_2fa": true,
+  "challenge": "64-znakowy-token",
+  "expires_in": 600,
+  "max_attempts": 5
+}
+```
+
+### `POST /auth/register-confirm`
+
+Potwierdza kod wysłany przez `POST /account/create`. Dopiero ten endpoint tworzy rekord użytkownika.
+
+Body:
+
+```json
+{
+  "email": "jan@example.com",
+  "code": "123456"
+}
+```
+
+Zamiast `code` można użyć pola `kod`. Kod jest ważny 15 minut i pozwala na maksymalnie 5 prób.
+
+### `POST /auth/2fa`
+
+Kończy logowanie użytkownika z włączonym 2FA. Dopiero po poprawnym kodzie tworzy sesję i ustawia cookie `session_id`.
+
+Body:
+
+```json
+{
+  "challenge": "token-z-odpowiedzi-login",
+  "code": "123456"
+}
+```
+
+Zamiast `challenge` i `code` można użyć pól `wyzwanie` i `kod`. Kod jest ważny 10 minut i pozwala na maksymalnie 5 prób.
+
+### `POST /auth/2fa/enable`
+
+Wymaga logowania. Włącza e-mailowe 2FA dla aktualnego użytkownika i wysyła powiadomienie o zmianie.
+
+### `POST /auth/2fa/disable`
+
+Wymaga logowania. Wyłącza 2FA, usuwa oczekujące wyzwanie logowania i wysyła powiadomienie o zmianie.
 
 ### `POST /auth/logout`
 
@@ -73,7 +125,7 @@ Wylogowuje użytkownika, usuwa sesję z bazy i czyści cookie `session_id`.
 
 ### `POST /account/create`
 
-Tworzy konto użytkownika.
+Rozpoczyna rejestrację: zapisuje dane oczekującej rejestracji i wysyła sześciocyfrowy kod e-mail. Konto nie jest jeszcze tworzone.
 
 Body:
 
@@ -82,7 +134,7 @@ Body:
   "imie": "Jan",
   "nazwisko": "Kowalski",
   "email": "jan@example.com",
-  "password": "minimum8znakow"
+  "password": "Minimum8!"
 }
 ```
 

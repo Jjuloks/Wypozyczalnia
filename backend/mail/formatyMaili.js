@@ -384,6 +384,45 @@ export function mailKodRejestracji({ kod, imie, waznyMinut = 15, branding } = {}
   };
 }
 
+export function mailWlaczono2FA({ imie, branding } = {}) {
+  const temat = 'Wlaczono uwierzytelnianie dwuetapowe';
+  const wstep = imie
+    ? `Czesc ${imie}, na Twoim koncie wlaczono uwierzytelnianie dwuetapowe (2FA).`
+    : 'Na Twoim koncie wlaczono uwierzytelnianie dwuetapowe (2FA).';
+  const dopisek = 'Od teraz podczas logowania po podaniu hasla wyslemy Ci jednorazowy kod e-mail. Jesli to nie Ty wykonales te zmiane, niezwlocznie zmien haslo.';
+
+  return {
+    temat,
+    tekst: linieTekstu([temat, wstep, dopisek]),
+    html: zbudujMailHtml({
+      tytul: temat,
+      wstep,
+      dopisek,
+      preheader: temat,
+      branding
+    })
+  };
+}
+
+export function mailWylaczono2FA({ imie, branding } = {}) {
+  const temat = 'Wylaczono uwierzytelnianie dwuetapowe';
+  const wstep = imie
+    ? `Czesc ${imie}, na Twoim koncie wylaczono uwierzytelnianie dwuetapowe (2FA).`
+    : 'Na Twoim koncie wylaczono uwierzytelnianie dwuetapowe (2FA).';
+  const dopisek = 'Kolejne logowania beda wymagaly tylko hasla. Jesli to nie Ty wykonales te zmiane, niezwlocznie zmien haslo i ponownie wlacz 2FA.';
+
+  return {
+    temat,
+    tekst: linieTekstu([temat, wstep, dopisek]),
+    html: zbudujMailHtml({
+      tytul: temat,
+      wstep,
+      dopisek,
+      preheader: temat,
+      branding
+    })
+  };
+}
 export function mailPotwierdzenieZapytaniaWypozyczenia({
   imie,
   nazwaSprzetu,
