@@ -118,11 +118,31 @@ export default function TabsLayout() {
         <View>
 
           {/* BREADCRUMBS */}
-          <View>
-            <ThemedText>Strona główna</ThemedText>
-            <ThemedText>›</ThemedText>
-            <ThemedText>Wszystkie produkty</ThemedText>
-          </View>
+          <View style={styles.category_path}>
+              <Pressable
+                style={styles.breadcrumbItem}
+                onPress={() => {
+                  router.push("/(tabs)/user");
+                }}
+              >
+                <MaterialIcons name="home" size={20} color="#176BDE" />
+              </Pressable>
+              {/* SEPARATOR */}
+              <MaterialIcons name="chevron-right" size={18} color="#176BDE" />
+
+                <Pressable
+                style={styles.breadcrumbItem}
+                onPress={() => {
+                  router.push(`../catalog/catalog/`);
+                }}
+              >
+                <Text style={styles.breadcrumbLast}>Wszystkie</Text>
+                 </Pressable>
+
+                 {/*TU DALEJ JAKIEGOS KATEGORIE W BREADCRUMBIE */}
+
+                 
+       </View>
 
 
         {/*NAGŁOWEK STRONY, OPISY ZACHECAJACE */}
@@ -423,4 +443,33 @@ suggestionPrice: {
   fontSize: 13,
   fontWeight: "700",
 },
+ breadcrumbItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 2,
+    zIndex : 1,
+    position : "relative",
+  },
+
+  breadcrumbText: {
+    fontSize: 14,
+    color: "#64748B",
+    fontWeight: "600",
+  },
+
+  breadcrumbLast: {
+    fontSize: 14,
+    color: "#176BDE",
+    fontWeight: "700",
+  },
+  category_path: {
+    marginTop: 28,
+    marginBottom: 24,
+    flexDirection: "row",
+    alignItems: "center",
+    flexWrap: "nowrap",
+    overflow: "hidden",
+    gap: 8,
+  },
+
 })
