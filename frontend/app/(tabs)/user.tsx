@@ -9,6 +9,8 @@ export default function User() {
   {/* CZAS RESETU */}
   const RESET_HOUR = 10
   const RESET_MINUTE = 0
+  
+
   const [timeLeft, setTimeLeft] = useState({ hours: 0, minutes: 0, seconds: 0 });
   const [lastResetDate,setLastResetDate] = useState<string | null>(null);
 
@@ -54,6 +56,10 @@ export default function User() {
   kategorieMap.set(2,"Elektronika")
   kategorieMap.set(3,"Narzedzia")
   kategorieMap.set(4,"Sport i rekreacja")
+
+
+ 
+
 
   const calculate_time_left =()=> {
     const now = new Date()
@@ -261,18 +267,27 @@ export default function User() {
 
       {/* KATEGORIE */}
       <View style={styles.categoriesRow}>
+        
+        <Pressable onPress={()=> router.push("../promotions/promotions")} style={[styles.categoryCard]}>
+          <View style={styles.categoryIconBox}> 
+  <MaterialIcons name={"discount"} size={32}
+                color="#F43F5E"/>
+          </View>
+      <Text style={styles.categoryName}>Promocje</Text>
+        </Pressable>
+
         {Array.from(kategorieMap).map(([key, val], index) => (
           <Pressable  onPress={()=> router.push(`../category/${key}`)}
             key={key}
             style={[
-              styles.categoryCard,
-              index === 0 && styles.categoryCardActive,
+              styles.categoryCard
+            
             ]}
           >
             <View
               style={[
                 styles.categoryIconBox,
-                index === 0 && styles.categoryIconBoxActive,
+          
               ]}
             >
 
@@ -280,7 +295,7 @@ export default function User() {
               <MaterialIcons
                 name={
                   index === 0
-                    ? "local-offer"
+                    ? "shopping-bag"
                     : index === 1
                     ? "devices"
                     : index === 2
@@ -288,15 +303,12 @@ export default function User() {
                     : "sports-soccer"
                 }
                 size={32}
-                color={index === 0 ? "#F43F5E" : "#176BDE"}
+                color= "#176BDE"
               />
             </View>
 
             <Text
-              style={[
-                styles.categoryName,
-                index === 0 && styles.categoryNameActive,
-              ]}
+              style={styles.categoryName}
             >
               {val}
             </Text>
