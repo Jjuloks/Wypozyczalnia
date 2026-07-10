@@ -240,11 +240,15 @@ Query parametry:
 
 Dla admina zwracany jest rzeczywisty status sprzętu. Dla zwykłego użytkownika status inny niż `dostepny` jest mapowany na `niedostepny`.
 
+Lista nie zawiera pola `specyfikacje`. Specyfikacje sprzętu można pobrać przez `GET /items/:id`.
+
 ### `GET /items/:id`
 
 Zwraca szczegóły jednego sprzętu.
 
 Dla admina zwracany jest rzeczywisty status sprzętu. Dla zwykłego użytkownika status inny niż `dostepny` jest mapowany na `niedostepny`.
+
+Odpowiedź zawiera pole `specyfikacje`, czyli tablicę obiektów z polami `id`, `nazwa_specyfikacji`, `opis_specyfikacji` i `emotka_specyfikacji`.
 
 ### `POST /items/dodaj`
 
@@ -263,6 +267,13 @@ Body JSON albo `multipart/form-data`:
     "1": "https://example.com/wiertarka.jpg",
     "2": "https://example.com/wiertarka-2.jpg"
   },
+  "specyfikacje": [
+    {
+      "nazwa_specyfikacji": "Procesor",
+      "opis_specyfikacji": "Intel Core i5",
+      "emotka_specyfikacji": "cpu.fill"
+    }
+  ],
   "cena": "49.99",
   "cena_po_promocji": "39.99",
   "status": "dostepny"
@@ -281,6 +292,7 @@ Opcjonalne pola:
 
 * `opis`
 * `zdjecia_url`
+* `specyfikacje`
 * `cena_po_promocji`
 * `status`
 
@@ -298,6 +310,7 @@ Edytuje sprzęt. Można zmieniać:
 * `status`
 * `cena`
 * `cena_po_promocji`
+* `specyfikacje` - wysłana tablica zastępuje całą listę specyfikacji sprzętu
 
 Zdjęć nie można zmieniać przez `edit/:id`. Do tego służą osobne endpointy poniżej.
 

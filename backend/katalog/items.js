@@ -95,8 +95,12 @@ function formatujUrlZdjecia(zdjecie_url) {
   return `${process.env.S3_WEB_ENDPOINT.replace(/\/+$/, "")}/${zdjecie_url.replace(/^\/+/, "")}`;
 }
 
-function czyObiektZdjec(wartosc) {
+function czyZwyklyObiekt(wartosc) {
   return wartosc && typeof wartosc === "object" && !Array.isArray(wartosc);
+}
+
+function czyObiektZdjec(wartosc) {
+  return czyZwyklyObiekt(wartosc);
 }
 
 function uporzadkujZdjeciaUrl(zdjecia_url) {
@@ -116,6 +120,52 @@ function formatujZdjeciaUrl(zdjecia_url) {
   return Object.fromEntries(
     Object.entries(zdjecia).map(([numer, url]) => [numer, formatujUrlZdjecia(url)])
   );
+}
+
+function formatujSpecyfikacje(specyfikacje) {
+  if (!Array.isArray(specyfikacje)) {
+    return [];
+  }
+
+  return specyfikacje.map((specyfikacja) => ({
+    id: Number(specyfikacja.id),
+    nazwa_specyfikacji: specyfikacja.nazwa_specyfikacji,
+    opis_specyfikacji: specyfikacja.opis_specyfikacji,
+    emotka_specyfikacji: specyfikacja.emotka_specyfikacji
+  }));
+}
+
+function podstawowePolaSprzetuSql(alias = "s") {
+  return `
+        ${alias}.id,
+        ${alias}.nazwa,
+        ${alias}.opis,
+        ${alias}.kategoria_id,
+        ${alias}.status,
+        ${alias}.zdjecia_url,
+        ${alias}.cena,
+        ${alias}.cena_po_promocji`;
+}
+
+function polaSprzetuSql(alias = "s") {
+  return `
+        ${podstawowePolaSprzetuSql(alias)},
+        COALESCE((
+          SELECT jsonb_agg(
+            jsonb_build_object(
+              'id', spec.id,
+              'nazwa_specyfikacji', spec.nazwa_specyfikacji,
+              'opis_specyfikacji', spec.opis_specyfikacji,
+              'emotka_specyfikacji', spec.emotka_specyfikacji
+            )
+          )
+          FROM (
+            SELECT id, nazwa_specyfikacji, opis_specyfikacji, emotka_specyfikacji
+            FROM specyfikacje_sprzetu
+            WHERE sprzet_id = ${alias}.id
+            ORDER BY kolejnosc, id
+          ) spec
+        ), '[]'::jsonb) AS specyfikacje`;
 }
 
 function nastepnyNumerZdjecia(zdjecia_url) {
@@ -203,6 +253,80 @@ function parsujUrlZdjecia(wartosc) {
   } catch {
     return { poprawna: false };
   }
+}
+
+function parsujSpecyfikacje(wartosc) {
+  if (
+    wartosc === undefined ||
+    wartosc === null ||
+    (typeof wartosc === "string" && wartosc.trim() === "")
+  ) {
+    return { poprawna: true, wartosc: [] };
+  }
+
+  let specyfikacje = wartosc;
+
+  if (typeof wartosc === "string") {
+    try {
+      specyfikacje = JSON.parse(wartosc);
+    } catch {
+      return { poprawna: false };
+    }
+  }
+
+  if (!Array.isArray(specyfikacje)) {
+    return { poprawna: false };
+  }
+
+  const wynik = [];
+
+  for (const specyfikacja of specyfikacje) {
+    if (!czyZwyklyObiekt(specyfikacja)) {
+      return { poprawna: false };
+    }
+
+    const nazwa_specyfikacji = normalizujTekst(specyfikacja.nazwa_specyfikacji);
+    const opis_specyfikacji = normalizujTekst(specyfikacja.opis_specyfikacji);
+    const emotka_specyfikacji = normalizujTekstOpcjonalny(specyfikacja.emotka_specyfikacji);
+
+    if (
+      !nazwa_specyfikacji ||
+      nazwa_specyfikacji.length > 100 ||
+      !opis_specyfikacji ||
+      (emotka_specyfikacji && emotka_specyfikacji.length > 100)
+    ) {
+      return { poprawna: false };
+    }
+
+    wynik.push({
+      nazwa_specyfikacji,
+      opis_specyfikacji,
+      emotka_specyfikacji
+    });
+  }
+
+  return { poprawna: true, wartosc: wynik };
+}
+
+function pobierzSpecyfikacjeZBody(body) {
+  if (czyPolePrzekazane(body, "specyfikacje")) {
+    return {
+      przekazane: true,
+      wartosc: body.specyfikacje
+    };
+  }
+
+  if (czyPolePrzekazane(body, "specyfikacja")) {
+    return {
+      przekazane: true,
+      wartosc: body.specyfikacja
+    };
+  }
+
+  return {
+    przekazane: false,
+    wartosc: undefined
+  };
 }
 
 function parsujZdjeciaUrl(wartosc, wymagane = false) {
@@ -361,7 +485,7 @@ function czyPoprawnePlikiZdjec(pliki) {
 }
 
 function mapujSprzet(sprzet, czyAdmin) {
-  return {
+  const wynik = {
     ...sprzet,
     cena: Number(sprzet.cena),
     cena_po_promocji: sprzet.cena_po_promocji === null
@@ -374,6 +498,12 @@ function mapujSprzet(sprzet, czyAdmin) {
         : "niedostepny",
     zdjecia_url: formatujZdjeciaUrl(sprzet.zdjecia_url)
   };
+
+  if (Object.prototype.hasOwnProperty.call(sprzet, "specyfikacje")) {
+    wynik.specyfikacje = formatujSpecyfikacje(sprzet.specyfikacje);
+  }
+
+  return wynik;
 }
 
 async function dodajZdjecieDoS3(plik) {
@@ -418,10 +548,61 @@ async function usunZdjeciaZS3(zdjecia_url) {
   }
 }
 
+async function dodajSpecyfikacjeSprzetu(client, sprzetId, specyfikacje) {
+  for (const [index, specyfikacja] of specyfikacje.entries()) {
+    await client.query(
+      `
+      INSERT INTO specyfikacje_sprzetu (
+        sprzet_id,
+        nazwa_specyfikacji,
+        opis_specyfikacji,
+        emotka_specyfikacji,
+        kolejnosc
+      )
+      VALUES ($1, $2, $3, $4, $5);
+      `,
+      [
+        sprzetId,
+        specyfikacja.nazwa_specyfikacji,
+        specyfikacja.opis_specyfikacji,
+        specyfikacja.emotka_specyfikacji,
+        index
+      ]
+    );
+  }
+}
+
+async function zapiszSpecyfikacjeSprzetu(client, sprzetId, specyfikacje) {
+  await client.query(
+    `
+    DELETE FROM specyfikacje_sprzetu
+    WHERE sprzet_id = $1;
+    `,
+    [sprzetId]
+  );
+
+  await dodajSpecyfikacjeSprzetu(client, sprzetId, specyfikacje);
+}
+
+async function pobierzSprzetPoId(client, id) {
+  const result = await client.query(
+    `
+    SELECT ${polaSprzetuSql("s")}
+    FROM sprzety s
+    WHERE s.id = $1;
+    `,
+    [id]
+  );
+
+  return result.rows[0] || null;
+}
+
 router.post("/dodaj", upload.fields([
   { name: "zdjecia", maxCount: 10 },
   { name: "zdjecie", maxCount: 1 }
 ]), async (req, res) => {
+  let client = null;
+  let transakcjaAktywna = false;
   const zdjeciaDodaneDoS3 = [];
 
   try {
@@ -442,6 +623,7 @@ router.post("/dodaj", upload.fields([
     const pliki = plikiZdjec(req);
     const zdjeciaZBody = parsujZdjeciaUrl(req.body.zdjecia_url);
     const zdjecia_url = zdjeciaZBody.wartosc || {};
+    const specyfikacjeZBody = parsujSpecyfikacje(req.body?.specyfikacje ?? req.body?.specyfikacja);
 
     if (
       !nazwa ||
@@ -452,6 +634,7 @@ router.post("/dodaj", upload.fields([
       !cenaPoPromocji.poprawna ||
       (cenaPoPromocji.wartosc !== null && cenaPoPromocji.wartosc > cena.wartosc) ||
       !zdjeciaZBody.poprawna ||
+      !specyfikacjeZBody.poprawna ||
       !czyPoprawnePlikiZdjec(pliki)
     ) {
       return res.status(400).json({
@@ -473,7 +656,11 @@ router.post("/dodaj", upload.fields([
       numerZdjecia += 1;
     }
 
-    const result = await pool.query(
+    client = await pool.connect();
+    await client.query("BEGIN");
+    transakcjaAktywna = true;
+
+    const result = await client.query(
       `
       INSERT INTO sprzety (
         nazwa,
@@ -485,13 +672,24 @@ router.post("/dodaj", upload.fields([
         status
       )
       VALUES ($1, $2, $3, $4, $5, $6, $7)
-      RETURNING id, nazwa, opis, kategoria_id, zdjecia_url, cena, cena_po_promocji, status;
+      RETURNING id;
       `,
       [nazwa, opis, kategoria_id, zdjecia_url, cena.wartosc, cenaPoPromocji.wartosc, status]
     );
 
-    return res.status(201).json(mapujSprzet(result.rows[0], true));
+    await dodajSpecyfikacjeSprzetu(client, result.rows[0].id, specyfikacjeZBody.wartosc);
+
+    const sprzet = await pobierzSprzetPoId(client, result.rows[0].id);
+
+    await client.query("COMMIT");
+    transakcjaAktywna = false;
+
+    return res.status(201).json(mapujSprzet(sprzet, true));
   } catch (err) {
+    if (transakcjaAktywna && client) {
+      await client.query("ROLLBACK").catch(console.error);
+    }
+
     for (const zdjecie of zdjeciaDodaneDoS3) {
       await usunZdjecieZS3(zdjecie).catch(console.error);
     }
@@ -513,6 +711,10 @@ router.post("/dodaj", upload.fields([
     return res.status(500).json({
       error: "Blad serwera"
     });
+  } finally {
+    if (client) {
+      client.release();
+    }
   }
 });
 
@@ -549,6 +751,20 @@ async function edytujSprzet(req, res) {
     const params = [];
     let cena = null;
     let cenaPoPromocji = null;
+    const specyfikacjeZBody = pobierzSpecyfikacjeZBody(body);
+    let specyfikacjeDoZapisu = null;
+
+    if (specyfikacjeZBody.przekazane) {
+      const specyfikacje = parsujSpecyfikacje(specyfikacjeZBody.wartosc);
+
+      if (!specyfikacje.poprawna) {
+        return res.status(400).json({
+          error: "Nieprawidlowe specyfikacje sprzetu."
+        });
+      }
+
+      specyfikacjeDoZapisu = specyfikacje.wartosc;
+    }
 
     if (czyPolePrzekazane(body, "nazwa")) {
       const nazwa = normalizujTekst(body.nazwa);
@@ -620,7 +836,7 @@ async function edytujSprzet(req, res) {
       }
     }
 
-    if (pola.length === 0 && !czyZmianaCeny) {
+    if (pola.length === 0 && !czyZmianaCeny && specyfikacjeDoZapisu === null) {
       return res.status(400).json({
         error: "Brak danych do aktualizacji."
       });
@@ -681,22 +897,30 @@ async function edytujSprzet(req, res) {
       }
     }
 
-    params.push(id);
+    if (pola.length > 0) {
+      params.push(id);
 
-    const result = await client.query(
-      `
-      UPDATE sprzety
-      SET ${pola.join(", ")}
-      WHERE id = $${params.length}
-      RETURNING id, nazwa, opis, kategoria_id, status, zdjecia_url, cena, cena_po_promocji;
-      `,
-      params
-    );
+      await client.query(
+        `
+        UPDATE sprzety
+        SET ${pola.join(", ")}
+        WHERE id = $${params.length}
+        RETURNING id;
+        `,
+        params
+      );
+    }
+
+    if (specyfikacjeDoZapisu !== null) {
+      await zapiszSpecyfikacjeSprzetu(client, id, specyfikacjeDoZapisu);
+    }
+
+    const sprzet = await pobierzSprzetPoId(client, id);
 
     await client.query("COMMIT");
     transakcjaAktywna = false;
 
-    return res.status(200).json(mapujSprzet(result.rows[0], true));
+    return res.status(200).json(mapujSprzet(sprzet, true));
   } catch (err) {
     if (transakcjaAktywna && client) {
       await client.query("ROLLBACK").catch(console.error);
@@ -828,20 +1052,21 @@ router.post("/add_photos/:id", upload.fields([
       numerZdjecia += 1;
     }
 
-    const result = await client.query(
+    await client.query(
       `
       UPDATE sprzety
       SET zdjecia_url = $1
-      WHERE id = $2
-      RETURNING id, nazwa, opis, kategoria_id, status, zdjecia_url, cena, cena_po_promocji;
+      WHERE id = $2;
       `,
       [uporzadkujZdjeciaUrl(zdjecia_url), id]
     );
 
+    const sprzet = await pobierzSprzetPoId(client, id);
+
     await client.query("COMMIT");
     transakcjaAktywna = false;
 
-    return res.status(200).json(mapujSprzet(result.rows[0], true));
+    return res.status(200).json(mapujSprzet(sprzet, true));
   } catch (err) {
     if (transakcjaAktywna && client) {
       await client.query("ROLLBACK").catch(console.error);
@@ -940,22 +1165,23 @@ router.delete("/delete_photos/:id", async (req, res) => {
       });
     }
 
-    const result = await client.query(
+    await client.query(
       `
       UPDATE sprzety
       SET zdjecia_url = $1
-      WHERE id = $2
-      RETURNING id, nazwa, opis, kategoria_id, status, zdjecia_url, cena, cena_po_promocji;
+      WHERE id = $2;
       `,
       [uporzadkujZdjeciaUrl(zdjecia_url), id]
     );
+
+    const sprzet = await pobierzSprzetPoId(client, id);
 
     await client.query("COMMIT");
     transakcjaAktywna = false;
 
     await usunZdjeciaZS3(zdjeciaDoUsuniecia);
 
-    return res.status(200).json(mapujSprzet(result.rows[0], true));
+    return res.status(200).json(mapujSprzet(sprzet, true));
   } catch (err) {
     if (transakcjaAktywna && client) {
       await client.query("ROLLBACK").catch(console.error);
@@ -1001,16 +1227,9 @@ router.delete("/usun/:id", async (req, res) => {
 
     await client.query("BEGIN");
 
-    const result = await client.query(
-      `
-      DELETE FROM sprzety
-      WHERE id = $1
-      RETURNING id, nazwa, opis, kategoria_id, status, zdjecia_url, cena, cena_po_promocji;
-      `,
-      [id]
-    );
+    const sprzet = await pobierzSprzetPoId(client, id);
 
-    if (result.rows.length === 0) {
+    if (!sprzet) {
       await client.query("ROLLBACK");
 
       return res.status(404).json({
@@ -1018,10 +1237,18 @@ router.delete("/usun/:id", async (req, res) => {
       });
     }
 
-    await usunZdjeciaZS3(result.rows[0].zdjecia_url);
+    await client.query(
+      `
+      DELETE FROM sprzety
+      WHERE id = $1;
+      `,
+      [id]
+    );
+
+    await usunZdjeciaZS3(sprzet.zdjecia_url);
     await client.query("COMMIT");
 
-    return res.status(200).json(mapujSprzet(result.rows[0], true));
+    return res.status(200).json(mapujSprzet(sprzet, true));
   } catch (err) {
     await client.query("ROLLBACK");
 
@@ -1164,18 +1391,10 @@ router.get("/", async (req, res) => {
 
     const result = await pool.query(
       `
-      SELECT 
-        id,
-        nazwa,
-        opis,
-        kategoria_id,
-        status,
-        zdjecia_url,
-        cena,
-        cena_po_promocji
-      FROM sprzety
+      SELECT ${podstawowePolaSprzetuSql("s")}
+      FROM sprzety s
       ${whereSql}
-      ORDER BY id
+      ORDER BY s.id
       LIMIT $${limitIndex} OFFSET $${offsetIndex};
       `,
       resultParams
@@ -1233,9 +1452,9 @@ router.get("/:id", async (req, res) => {
 
         const result = await pool.query(
             `
-            SELECT id, nazwa, opis, kategoria_id, status, zdjecia_url, cena, cena_po_promocji
-            FROM sprzety
-            WHERE id = $1;
+            SELECT ${polaSprzetuSql("s")}
+            FROM sprzety s
+            WHERE s.id = $1;
             `,
             [id]
         );

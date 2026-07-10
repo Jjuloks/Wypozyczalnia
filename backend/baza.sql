@@ -76,6 +76,26 @@ CREATE TABLE sprzety (
         )
 );
 
+CREATE TABLE specyfikacje_sprzetu (
+    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    sprzet_id INTEGER NOT NULL,
+    nazwa_specyfikacji VARCHAR(100) NOT NULL,
+    opis_specyfikacji TEXT NOT NULL,
+    emotka_specyfikacji VARCHAR(100),
+    kolejnosc INTEGER NOT NULL DEFAULT 0,
+
+    CONSTRAINT fk_specyfikacje_sprzety
+        FOREIGN KEY (sprzet_id)
+        REFERENCES sprzety(id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT chk_specyfikacje_kolejnosc
+        CHECK (kolejnosc >= 0)
+);
+
+CREATE INDEX idx_specyfikacje_sprzetu_sprzet_id
+    ON specyfikacje_sprzetu(sprzet_id);
+
 CREATE TABLE wypozyczenia (
     id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     sprzet_id INTEGER NOT NULL,
