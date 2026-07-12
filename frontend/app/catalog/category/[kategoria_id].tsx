@@ -2,13 +2,13 @@ import { Tabs, useLocalSearchParams } from "expo-router";
 import { View ,Text, FlatList,Image, StyleSheet} from "react-native";
 import { Stack } from 'expo-router';
 import { ThemedText } from "@/components/themed-text";
-import  dane from "../dane.json"
+import  dane from "../../dane.json"
 import { useState } from "react";
 
 export default function TabsLayout() {
-    const {id} = useLocalSearchParams();
+    const {kategoria_id} = useLocalSearchParams();
     const [tab,setTab] = useState(dane)
-    const selected_category = tab.filter((item)=> item.kategoria_id.toString() === id)
+    const selected_category = tab.filter((item)=> item.kategoria_id.toString() === kategoria_id)
 
 
   const sortowanieRosnaco =()=> {

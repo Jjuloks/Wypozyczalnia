@@ -163,6 +163,11 @@ export default function User() {
 }
         {/*KONTROLKI -> KATEGORIE, KONTAKT, DLA FIRM , JAK TO DZIALA */}
         <View style={styles.categoryContainer}>
+          <Pressable
+    style={styles.categoryWrapper}
+    onHoverIn={() => setshowcategoryPanel(true)}
+    onHoverOut={() => setshowcategoryPanel(false)}
+  > 
          <View style={styles.headerSideActions}>
           {/*onHoverIn, onHoverOut - działaja tylko na web , do mobliek dodac onPressIn, onPressOut */}
                 <Pressable style={styles.headerInfo} onHoverIn={()=>setshowcategoryPanel(true)} onHoverOut={()=> setshowcategoryPanel(false)}  >
@@ -171,7 +176,7 @@ export default function User() {
              </View>
       {/*ROZWIJANY PANEL KATEGORII, NARAZIE NIE WSZYSTKIE KATEGORIE */}
       {/*przeniesienie do odpowiedniego widoku kategorii, dodac ikonki do poszczegółnych kategorii */}
-      {showcategoryPanel && <View style={styles.categoryPanel}>
+      {showcategoryPanel && <View style={styles.categoryPanel} >
         {Array.from(kategorieMap).map((item,index)=>
         <Pressable key={index} style={styles.categoryItem}> 
         <View style={styles.categoryInfo}>
@@ -182,6 +187,7 @@ export default function User() {
         
         </View>
         }
+        </Pressable>
       </View>
               
               <View style={styles.headerSideActions}>
@@ -321,7 +327,7 @@ export default function User() {
         </Pressable>
 
         {Array.from(kategorieMap).map(([key, val], index) => (
-          <Pressable  onPress={()=> router.push(`../category/${key}`)}
+          <Pressable  onPress={()=> router.push(`../catalog/catalog/category/${key}`)}
             key={key}
             style={[
               styles.categoryCard
@@ -1043,16 +1049,17 @@ suggestionPrice: {
   fontWeight: "700",
 },
 categoryPanel : {
-  position: "absolute",
-  top: 52,                    
-  left: "50%",                
-  transform: [{ translateX: -110 }],   
+ position: "absolute",
+  top: 52,
+  left: -20,
+  transform: [{ translateX: -110 }],
   backgroundColor: "#FFFFFF",
   borderRadius: 16,
   borderWidth: 1,
   borderColor: "#E2E8F0",
   paddingVertical: 8,
-  paddingHorizontal: 6,
+  paddingHorizontal: 12,
+  paddingTop: 24,           // zwiększone
   width: 220,
   shadowColor: "#0F172A",
   shadowOffset: { width: 0, height: 10 },
@@ -1071,6 +1078,9 @@ categoryItem : {
   marginHorizontal: 4,
 },
 categoryContainer :{
-  position : "relative"
-}
+  position : "relative",
+},
+categoryWrapper: {
+  position: "relative",
+},
 });

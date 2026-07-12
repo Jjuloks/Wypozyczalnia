@@ -191,7 +191,7 @@ export default function TabsLayout() {
                 <ThemedText>Buty</ThemedText>
               </Pressable>
 
-              <Pressable>
+              <Pressable onPress={()=> router.push(`./category/2`)}>
                 <ThemedText>▣</ThemedText>
                 <ThemedText>Elektronika</ThemedText>
               </Pressable>
