@@ -8,6 +8,15 @@ import { useState } from "react";
 import { router } from "expo-router";
 
 export default function TabsLayout() {
+  {/*kategorie-dostepne */}
+    
+  const kategorieMap = new Map();
+  kategorieMap.set(1,"Buty")
+  kategorieMap.set(2,"Elektronika")
+  kategorieMap.set(3,"Narzedzia")
+  kategorieMap.set(4,"Sport i rekreacja")
+
+
     const [tab,setTab] = useState(dane)
     const {query} = useLocalSearchParams();
     const [searchText,setsearchText] = useState("")
@@ -173,38 +182,38 @@ export default function TabsLayout() {
          {/* UKŁAD KATALOGU */}
           <View>
             {/* LEWY PANEL KATEGORII, KATEGORIE MAPOWANE Z DANYCH , NARAZIE PRZYKŁADOWE NIE WSZYSTKO */}
-            <View>
-              <ThemedText>Kategorie</ThemedText>
+            <View style={styles.catalogLayout}>
+              <View style={styles.categoriesSidebar}>   
+                 <ThemedText style={styles.sidebarTitle}>
+                Kategorie
+              </ThemedText>
+               <Pressable  onPress={()=> router.push(`./catalog/caalog`)}  style={styles.categoryItem}>
+                <MaterialIcons name="grid-view" size={32} color="blue" style={styles.categoryIcon} />
 
-              <Pressable>
-                <ThemedText>▦</ThemedText>
-                <ThemedText>Wszystkie kategorie</ThemedText>
-              </Pressable>
+                    <ThemedText style={styles.categoryText}>Wszystkie kategorie</ThemedText>
 
-              <Pressable>
-                <ThemedText>◆</ThemedText>
-                <ThemedText>Promocje</ThemedText>
-              </Pressable>
+                  </Pressable>
+                   <Pressable  onPress={()=> router.push("/promotions/promotions")}  style={styles.categoryItem}>
+                    <MaterialIcons name={"discount"} size={32}
+                                    color="#F43F5E" style={styles.categoryIcon}/>
+                  
 
-              <Pressable>
-                <ThemedText>◒</ThemedText>
-                <ThemedText>Buty</ThemedText>
-              </Pressable>
+                    <ThemedText style={styles.categoryText}>Promocje</ThemedText>
+                    {/*ikonka do kategorii */}
+                   
+                  </Pressable>
 
-              <Pressable onPress={()=> router.push(`./category/2`)}>
-                <ThemedText>▣</ThemedText>
-                <ThemedText>Elektronika</ThemedText>
-              </Pressable>
+              {Array.from(kategorieMap).map(([key,val],index)=> (
+                  <Pressable key={key} onPress={()=> router.push(`./category/${key}`)}  style={styles.categoryItem}>
+                    <ThemedText style={styles.categoryText}>{val}</ThemedText>
+                    {/*ikonka do kategorii */}
+                    <ThemedText></ThemedText>
+                  </Pressable>
+              ))}
 
-              <Pressable>
-                <ThemedText>⚒</ThemedText>
-                <ThemedText>Narzędzia</ThemedText>
-              </Pressable>
 
-              <Pressable>
-                <ThemedText>◉</ThemedText>
-                <ThemedText>Sport i rekreacja</ThemedText>
-              </Pressable>
+</View>
+       
             </View>
 
              {/* PRAWA CZĘŚĆ */}
@@ -547,5 +556,57 @@ pageHeading: {
     fontSize: 12,
     marginTop: 2,
   },
+    catalogLayout: {
+    width: "100%",
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 20,
+  },
+
+  categoriesSidebar: {
+    width: 215,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 22,
+
+    shadowColor: "#1E3A8A",
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    shadowOpacity: 0.04,
+    shadowRadius: 22,
+    elevation: 2,
+  },
+  sidebarTitle: {
+    color: "#151D2F",
+    fontSize: 14,
+    fontWeight: "800",
+    marginBottom: 14,
+    paddingHorizontal: 4,
+  },
+
+  categoryItem: {
+    minHeight: 50,
+    flexDirection: "row",
+    alignItems: "center",
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    marginBottom: 4,
+    gap: 12,
+  },
+   categoryText: {
+    color: "#263247",
+    fontSize: 13,
+    fontWeight: "600",
+  },
+   categoryIcon: {
+    width: 20,
+    fontSize: 19,
+    textAlign: "center",
+  },
+  
+
 
 })
