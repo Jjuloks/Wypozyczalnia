@@ -327,7 +327,7 @@ export default function User() {
         </Pressable>
 
         {Array.from(kategorieMap).map(([key, val], index) => (
-          <Pressable  onPress={()=> router.push(`../catalog/catalog/category/${key}`)}
+          <Pressable  onPress={()=> router.push(`../catalog/category/${key}`)}
             key={key}
             style={[
               styles.categoryCard

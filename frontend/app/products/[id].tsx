@@ -224,7 +224,7 @@ export default function ProductDetailedView() {
               <Pressable
                 style={styles.breadcrumbItem}
                 onPress={() => {
-                  router.push(`../category/${product.kategoria_id}`);
+                  router.push(`../catalog/category/${product.kategoria_id}`);
                 }}
               >
                 <Text style={styles.breadcrumbText}>{kategorieMap.get(product.kategoria_id)}</Text>
