@@ -1,5 +1,5 @@
 import { Tabs, useLocalSearchParams } from "expo-router";
-import { View ,Text, FlatList,Image, StyleSheet,Pressable,TextInput} from "react-native";
+import { View ,Text, FlatList,Image, StyleSheet,Pressable,TextInput,ScrollView} from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Stack } from 'expo-router';
 import { ThemedText } from "@/components/themed-text";
@@ -15,6 +15,40 @@ export default function TabsLayout() {
   kategorieMap.set(2,"Elektronika")
   kategorieMap.set(3,"Narzedzia")
   kategorieMap.set(4,"Sport i rekreacja")
+
+
+
+  
+  {/*statusy Sprzetu */}
+  type StatusSprzetu = "dostepny" | "wypozyczony" | "w_naprawie";
+
+  type StatusStyle = {
+  label: string;
+  backgroundColor: string;
+  textColor: string;
+  icon: keyof typeof MaterialIcons.glyphMap;
+  };
+
+  const statusStyles: Record<StatusSprzetu, StatusStyle> = {
+  dostepny: {
+    label: "Dostępny",
+    backgroundColor: "#DCFCE7",
+    textColor: "#166534",
+    icon: "check-circle",
+  },
+  wypozyczony: {
+    label: "Wypożyczony",
+    backgroundColor: "#DBEAFE",
+    textColor: "#1E40AF",
+    icon: "hourglass-empty",
+  },
+  w_naprawie: {
+    label: "W naprawie",
+    backgroundColor: "#FEF3C7",
+    textColor: "#92400E",
+    icon: "build",
+  },
+  };
 
 
     const [tab,setTab] = useState(dane)
@@ -34,7 +68,14 @@ export default function TabsLayout() {
 
   
   return (
+    <View>
+         <ScrollView
+            style={styles.scroll}
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
+          > 
     <View style={styles.page}>
+       
       {/* HEADER */}
       <View style={styles.header}>
         <View style={styles.headerName}>
@@ -219,7 +260,7 @@ export default function TabsLayout() {
              {/* PRAWA CZĘŚĆ */}
             <View>
               {/* PANEL FILTRÓW */}
-              <View>
+              <View style={styles.filterPanel}>
                 {/* GÓRNY RZĄD FILTRÓW */}
                 <View>
                   <View>
@@ -285,10 +326,82 @@ export default function TabsLayout() {
               </View>
              {/* LISTA PRODUKTÓW */}
   <FlatList data={tab_filtered} keyExtractor={(elem)=> elem.id.toString()} numColumns={4} renderItem={({item})=> (
-        <View>
-            <ThemedText>{item.nazwa}</ThemedText>
-            <ThemedText>{item.cena}</ThemedText>
-            <ThemedText>{item.cena_po_promocji}</ThemedText>
+        <View style={styles.productCard}>
+          {/*poprawny link do prodkutu */}
+          <Pressable onPress={()=> router.push(`../../products/${item.id}`)}>
+              {/* DODAJ DO ULUBIONYCH */}
+            <Pressable style={styles.favoriteButton}>
+              <MaterialIcons name="favorite-border" size={23} color="#111827" />
+            </Pressable>
+             {/* ZDJECIE PRODUKTU*/}
+            <View style={styles.productImageBox}>
+              <Image
+                source={{ uri: item.zdjecie_url }}
+                style={styles.productImage}
+                resizeMode="contain"
+              />
+            </View>
+
+             {/* NAZWA PRODUKTU */}
+            <View style={styles.productInfo}>
+              <Text style={styles.productName} numberOfLines={1}>
+                {item.nazwa}
+              </Text>
+
+                       <View
+            style={[
+              styles.productStatusBadge,
+              {
+                backgroundColor:
+                  statusStyles[item.status as keyof typeof statusStyles].backgroundColor,
+              },
+            ]}
+          >
+            <MaterialIcons
+              name={statusStyles[item.status as keyof typeof statusStyles].icon}
+              size={14}
+              color={statusStyles[item.status as keyof typeof statusStyles].textColor}
+            />
+
+            <Text
+              style={[
+                styles.productStatusText,
+                {
+                  color: statusStyles[item.status as keyof typeof statusStyles].textColor,
+                },
+              ]}
+            >
+              {statusStyles[item.status as keyof typeof statusStyles].label}
+            </Text>
+          </View>
+
+                  {/* OPIS PRODUKTU */}
+              <Text style={styles.productDescription} numberOfLines={2}>
+                {item.opis}
+              </Text>
+
+                  {/* CENA PRODUKTU */}
+              <View style={styles.productBottom}>
+                <View>
+                  <Text style={styles.productPrice}>99,99 zł</Text>
+                
+                  {/* OCENA PRODUKTU */}
+                  <View style={styles.ratingRow}>
+                    <MaterialIcons name="star" size={17} color="#F59E0B" />
+                    <Text style={styles.ratingText}>4.8</Text>
+                  </View>
+                </View>
+
+               {/* DODAJ DO KOSZYKA */}
+                <Pressable style={styles.addButton}>
+                  <MaterialIcons name="add" size={24} color="#176BDE" />
+                </Pressable>
+              </View>
+              </View>
+
+
+          </Pressable>
+         
         </View>
       )}
 >
@@ -308,22 +421,12 @@ export default function TabsLayout() {
     
 </View>
     </View>
-
+    </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-    productImage : {
-    width: "100%",
-    height: "100%",
-    },
-    page: {
-    width: "100%",
-    maxWidth: 1440,
-    alignSelf: "center",
-    paddingHorizontal: 32,
-    paddingBottom: 40,
-  },
   header: {
     width: "100%",
     minHeight: 72,
@@ -602,7 +705,138 @@ pageHeading: {
     fontSize: 19,
     textAlign: "center",
   },
-  
+   productCard: {
+    flex: 1,
+    minHeight: 310,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 24,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+    padding: 18,
+    position: "relative",
+
+    shadowColor: "#0F172A",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.05,
+    shadowRadius: 18,
+    elevation: 4,
+  },
+  favoriteButton: {
+    position: "absolute",
+    top: 16,
+    right: 16,
+    zIndex: 5,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: "#FFFFFF",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  productImageBox: {
+    height: 150,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 14,
+  },
+
+  productImage: {
+    width: "100%",
+    height: "100%",
+  },
+
+  productInfo: {
+    flex: 1,
+  },
+
+  productName: {
+    fontSize: 17,
+    fontWeight: "900",
+    color: "#111827",
+    marginBottom: 4,
+  },
+  productStatusBadge: {
+    alignSelf: "flex-start",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 999,
+    marginBottom: 8,
+  },
+
+  productStatusText: {
+    fontSize: 12,
+    fontWeight: "800",
+  },
+  productDescription: {
+    fontSize: 13,
+    lineHeight: 18,
+    color: "#64748B",
+    minHeight: 36,
+  },
+
+  productBottom: {
+    marginTop: 16,
+    flexDirection: "row",
+    alignItems: "flex-end",
+    justifyContent: "space-between",
+  },
+
+  productPrice: {
+    fontSize: 19,
+    fontWeight: "900",
+    color: "#111827",
+    marginBottom: 8,
+  },
+
+  ratingRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+
+  ratingText: {
+    fontSize: 13,
+    fontWeight: "700",
+    color: "#64748B",
+  },
+
+  addButton: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    borderWidth: 1.5,
+    borderColor: "#176BDE",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#FFFFFF",
+  },
+  scroll: {
+  flex: 1,
+  },
+  filterPanel : {
+    flex: 1,
+    minHeight: 310,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 24,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+    padding: 18,
+    position: "relative",
+
+    shadowColor: "#0F172A",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.05,
+    shadowRadius: 18,
+    elevation: 4,
+  },
+  scrollContent: {
+    paddingBottom: 60,
+  },
+
 
 
 })
