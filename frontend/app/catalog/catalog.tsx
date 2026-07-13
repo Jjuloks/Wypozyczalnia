@@ -84,9 +84,9 @@ export default function TabsLayout({kategoriaId,tylkoPromocje, promocja} : Catal
 
   const handleSwitchPromotion =()=> {
     if(kategoriaId){
-      router.push(promocja ? `/catalog/category/${kategoriaId}` :  `/catalog/category/${kategoriaId}?promocja=true`)
+          return router.push(promocja ? `/catalog/category/${kategoriaId}` :  `/catalog/category/${kategoriaId}?promocja=true`)
     }
-    return ;
+
      router.push(tylkoPromocje ? "/catalog/catalog" : "/catalog/promotions")
   }
  
