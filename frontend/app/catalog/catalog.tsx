@@ -7,7 +7,14 @@ import  dane from "../dane.json"
 import { useState } from "react";
 import { router } from "expo-router";
 
-export default function TabsLayout() {
+
+{/*props */}
+type CatalogViewProps = {
+  kategoriaId?: string;
+  };
+
+
+export default function TabsLayout({kategoriaId} : CatalogViewProps) {
   {/*kategorie-dostepne */}
     
   const kategorieMap = new Map();
@@ -16,7 +23,7 @@ export default function TabsLayout() {
   kategorieMap.set(3,"Narzedzia")
   kategorieMap.set(4,"Sport i rekreacja")
 
-
+  
 
   
   {/*statusy Sprzetu */}
@@ -55,7 +62,13 @@ export default function TabsLayout() {
     const {query} = useLocalSearchParams();
     const [searchText,setsearchText] = useState("")
     const searchQuery = String(query ?? "").toLowerCase();
-    const tab_filtered = tab.filter((item)=> item.nazwa.toLowerCase().includes(searchQuery))
+    const tab_filtered = tab.filter((item)=> {
+       const filterSearch = item.nazwa.toLowerCase().includes(searchQuery);
+       const filterCategory = !kategoriaId || String(item.kategoria_id) === String(kategoriaId);
+     
+
+       return filterSearch && filterCategory
+      })
     
     const suggestions = dane.filter((item)=> item.nazwa.toLowerCase().includes(searchText.trim().toLowerCase()))
 
@@ -228,7 +241,7 @@ export default function TabsLayout() {
                  <ThemedText style={styles.sidebarTitle}>
                 Kategorie
               </ThemedText>
-               <Pressable  onPress={()=> router.push(`./catalog`)}  style={[styles.categoryItem, styles.categoryItemActive]}>
+               <Pressable  onPress={()=> router.push(`/catalog/catalog`)}  style={[styles.categoryItem, styles.categoryItemActive]}>
                 <MaterialIcons name="grid-view" size={32} color="#176BDE" style={styles.categoryIcon} />
 
                     <ThemedText style={[styles.categoryText, styles.categoryTextActive]}>Wszystkie kategorie</ThemedText>
@@ -245,7 +258,7 @@ export default function TabsLayout() {
                   </Pressable>
 
               {Array.from(kategorieMap).map(([key,val],index)=> (
-                  <Pressable key={key} onPress={()=> router.push(`./category/${key}`)}  style={styles.categoryItem}>
+                  <Pressable key={key} onPress={()=> router.push(`catalog/category/${key}`)}  style={styles.categoryItem}>
                     <ThemedText style={styles.categoryText}>{val}</ThemedText>
                     {/*ikonka do kategorii */}
                     <ThemedText></ThemedText>

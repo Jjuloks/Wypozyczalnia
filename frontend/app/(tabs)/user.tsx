@@ -4,8 +4,11 @@ import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { FlatList, Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import dane from "../dane.json";
+import { useLocalSearchParams } from "expo-router";
 
 export default function User() {
+  const { kategoria_id } = useLocalSearchParams();
+
   {/* CZAS RESETU */}
   const RESET_HOUR = 10
   const RESET_MINUTE = 0
@@ -15,6 +18,7 @@ export default function User() {
   const [lastResetDate,setLastResetDate] = useState<string | null>(null);
 
   const [katalog,setKatalog] = useState(dane)
+  const products = kategoria_id ? katalog.filter((product)=> String(product.kategoria_id)=== String(kategoria_id)) : katalog
   const [searchText,setsearchText] = useState("")
   const [randomIndex,setRandomIndex] = useState(0)
   const [showcategoryPanel,setshowcategoryPanel] = useState(false)
@@ -376,7 +380,7 @@ export default function User() {
 
       {/* KATALOG -> PRODUKTY/BESTSELLERY*/}
       <FlatList
-        data={dane}
+        data={products}
         keyExtractor={(item) => item.id.toString()}
         numColumns={4}
         scrollEnabled={false}
