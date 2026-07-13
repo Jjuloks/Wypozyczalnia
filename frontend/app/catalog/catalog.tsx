@@ -64,9 +64,8 @@ export default function TabsLayout({kategoriaId,tylkoPromocje, promocja} : Catal
     const {query} = useLocalSearchParams();
     const [searchText,setsearchText] = useState("")
     const searchQuery = String(query ?? "").toLowerCase();
-    
+    const promocjeAktywne = tylkoPromocje || promocja;
     const tab_filtered = tab.filter((item)=> {
-      const promocjeAktywne = tylkoPromocje || promocja 
        const filterSearch = item.nazwa.toLowerCase().includes(searchQuery);
        const filterCategory = !kategoriaId || String(item.kategoria_id) === String(kategoriaId);
        const filterPromotion = !promocjeAktywne || item.promocja === true
@@ -83,7 +82,14 @@ export default function TabsLayout({kategoriaId,tylkoPromocje, promocja} : Catal
     }
 
 
-  
+  const handleSwitchPromotion =()=> {
+    if(kategoriaId){
+      router.push(promocja ? `/catalog/category/${kategoriaId}` :  `/catalog/category/${kategoriaId}?promocja=true`)
+    }
+    return ;
+     router.push(tylkoPromocje ? "/catalog/catalog" : "/catalog/promotions")
+  }
+ 
   return (
     <View style={styles.screen}>
          <ScrollView
@@ -323,10 +329,10 @@ export default function TabsLayout({kategoriaId,tylkoPromocje, promocja} : Catal
                     </Pressable>
                   </View>
 
-                  <Pressable style={styles.promotionFilter} >
+                  <Pressable style={styles.promotionFilter} onPress={()=> handleSwitchPromotion()}>
                     <ThemedText style={styles.promotionIcon}>◆</ThemedText>
                     <ThemedText style={styles.promotionLabel}>Promocja</ThemedText>
-                    <View style={[styles.switchTrack, tylkoPromocje && styles.switchTrack1]}>
+                    <View style={[styles.switchTrack, promocjeAktywne && styles.switchTrack1]}>
                       <View style={styles.switchThumb} />
                     </View>
                   </Pressable>
@@ -1180,6 +1186,12 @@ pageHeading: {
     marginTop : 0,
   },
   switchTrack1 :{ 
+    width: 38,
+    height: 21,
+    borderRadius: 999,
+    padding: 2,
+    alignItems: "flex-end",
+    justifyContent: "center",
     backgroundColor : "red"
   }
 

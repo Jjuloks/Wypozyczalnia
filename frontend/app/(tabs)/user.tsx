@@ -303,7 +303,7 @@ export default function User() {
         <Text style={styles.sectionTitle}>Kategorie</Text>
 
         <View style={styles.sectionActions}>
-          <Pressable style={styles.allButton} onPress={()=> router.push("../catalog/catalog")}>
+          <Pressable style={styles.allButton} onPress={()=> router.push("/catalog/catalog")}>
             <Text style={styles.allButtonText}>Wszystkie</Text>
           </Pressable>
 
@@ -372,7 +372,7 @@ export default function User() {
       <View style={styles.sectionHeader}>
         <Text style={styles.sectionTitle}>Bestsellery</Text>
 
-        <Pressable style={styles.seeAllButton} onPress={()=> router.push("../catalog/catalog")}>
+        <Pressable style={styles.seeAllButton} onPress={()=> router.push("/catalog/catalog")}>
           <Text style={styles.seeAllText}>Zobacz wszystkie</Text>
           <MaterialIcons name="chevron-right" size={22} color="#176BDE" />
         </Pressable>
