@@ -65,7 +65,7 @@ export default function TabsLayout({kategoriaId} : CatalogViewProps) {
     const tab_filtered = tab.filter((item)=> {
        const filterSearch = item.nazwa.toLowerCase().includes(searchQuery);
        const filterCategory = !kategoriaId || String(item.kategoria_id) === String(kategoriaId);
-     
+
 
        return filterSearch && filterCategory
       })
@@ -75,7 +75,7 @@ export default function TabsLayout({kategoriaId} : CatalogViewProps) {
     const handleSearchSubmit =()=> {
         const query = searchText.trim()
 
-        router.push({pathname : "../catalog/catalog", params : {query : searchText} })
+        router.push({pathname : "catalog/catalog", params : {query : searchText} })
     }
 
 
@@ -241,7 +241,7 @@ export default function TabsLayout({kategoriaId} : CatalogViewProps) {
                  <ThemedText style={styles.sidebarTitle}>
                 Kategorie
               </ThemedText>
-               <Pressable  onPress={()=> router.push(`/catalog/catalog`)}  style={[styles.categoryItem, styles.categoryItemActive]}>
+               <Pressable  onPress={()=> router.push(`/catalog/catalog`)}  style={[styles.categoryItem, !kategoriaId && styles.categoryItemActive]}>
                 <MaterialIcons name="grid-view" size={32} color="#176BDE" style={styles.categoryIcon} />
 
                     <ThemedText style={[styles.categoryText, styles.categoryTextActive]}>Wszystkie kategorie</ThemedText>
@@ -258,7 +258,7 @@ export default function TabsLayout({kategoriaId} : CatalogViewProps) {
                   </Pressable>
 
               {Array.from(kategorieMap).map(([key,val],index)=> (
-                  <Pressable key={key} onPress={()=> router.push(`catalog/category/${key}`)}  style={styles.categoryItem}>
+                  <Pressable key={key} onPress={()=> router.push(`catalog/category/${key}`)}  style={[styles.categoryItem , String(kategoriaId)=== String(key) && styles.categoryItemActive]}>
                     <ThemedText style={styles.categoryText}>{val}</ThemedText>
                     {/*ikonka do kategorii */}
                     <ThemedText></ThemedText>
