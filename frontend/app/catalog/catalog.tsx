@@ -187,7 +187,7 @@ export default function TabsLayout() {
                  <ThemedText style={styles.sidebarTitle}>
                 Kategorie
               </ThemedText>
-               <Pressable  onPress={()=> router.push(`./catalog/caalog`)}  style={styles.categoryItem}>
+               <Pressable  onPress={()=> router.push(`./catalog`)}  style={styles.categoryItem}>
                 <MaterialIcons name="grid-view" size={32} color="blue" style={styles.categoryIcon} />
 
                     <ThemedText style={styles.categoryText}>Wszystkie kategorie</ThemedText>
@@ -285,16 +285,12 @@ export default function TabsLayout() {
               </View>
              {/* LISTA PRODUKTÓW */}
   <FlatList data={tab_filtered} keyExtractor={(elem)=> elem.id.toString()} numColumns={4} renderItem={({item})=> (
-
-
         <View>
             <ThemedText>{item.nazwa}</ThemedText>
             <ThemedText>{item.cena}</ThemedText>
             <ThemedText>{item.cena_po_promocji}</ThemedText>
         </View>
       )}
-
-
 >
 
 </FlatList>
