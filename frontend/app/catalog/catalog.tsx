@@ -165,7 +165,7 @@ export default function TabsLayout() {
       </View>
 
         {/* GŁÓWNA ZAWARTOŚĆ */}
-        <View>
+        <View style={styles.mainContent}>
 
           {/* BREADCRUMBS */}
           <View style={styles.category_path}>
@@ -221,7 +221,7 @@ export default function TabsLayout() {
           </View>
 
          {/* UKŁAD KATALOGU */}
-          <View>
+         
             {/* LEWY PANEL KATEGORII, KATEGORIE MAPOWANE Z DANYCH , NARAZIE PRZYKŁADOWE NIE WSZYSTKO */}
             <View style={styles.catalogLayout}>
               <View style={styles.categoriesSidebar}>   
@@ -254,16 +254,14 @@ export default function TabsLayout() {
 
 
 </View>
-       
-            </View>
 
              {/* PRAWA CZĘŚĆ */}
-            <View>
+            <View style={styles.catalogContent}>
               {/* PANEL FILTRÓW */}
-              <View style={styles.filterPanel}>
+              <View style={styles.filtersPanel}>
                 {/* GÓRNY RZĄD FILTRÓW */}
-                <View>
-                  <View>
+                <View style={styles.filtersTopRow}>
+                  <View  style={styles.filterGroup}>
                     <ThemedText>Cena od</ThemedText>
                     <TextInput placeholder="od 0 zł" />
                   </View>
@@ -308,8 +306,8 @@ export default function TabsLayout() {
                 </View>
 
                 {/* DOLNY RZĄD FILTRÓW */}
-                <View>
-                  <View>
+                <View style={styles.filtersBottomRow}>
+                  <View style={styles.filterActions}>
                     <Pressable>
                       <ThemedText>☷</ThemedText>
                       <ThemedText>Więcej filtrów</ThemedText>
@@ -419,7 +417,8 @@ export default function TabsLayout() {
 
       <ThemedText> WSZYSTKO </ThemedText>
     
-</View>
+
+    </View>
     </View>
     </ScrollView>
     </View>
@@ -817,25 +816,47 @@ pageHeading: {
   scroll: {
   flex: 1,
   },
-  filterPanel : {
-    flex: 1,
-    minHeight: 310,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 24,
-    borderWidth: 1,
-    borderColor: "#E2E8F0",
-    padding: 18,
-    position: "relative",
-
-    shadowColor: "#0F172A",
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.05,
-    shadowRadius: 18,
-    elevation: 4,
-  },
   scrollContent: {
     paddingBottom: 60,
   },
+  catalogContent: {
+    flex: 1,
+    minWidth: 0,
+  },
+
+  filtersPanel: {
+    width: "100%",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 20,
+    paddingHorizontal: 18,
+    paddingVertical: 18,
+    marginBottom: 16,
+
+    shadowColor: "#1E3A8A",
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    shadowOpacity: 0.04,
+    shadowRadius: 22,
+    elevation: 2,
+  },
+
+  filtersTopRow: {
+    width: "100%",
+    flexDirection: "row",
+    alignItems: "flex-end",
+    gap: 14,
+  },
+   filterGroup: {
+    flex: 1,
+    minWidth: 115,
+  },
+  mainContent : {
+    width : "100%",
+    marginTop : 22,
+  }
+
 
 
 
