@@ -68,7 +68,7 @@ export default function TabsLayout() {
 
   
   return (
-    <View>
+    <View style={styles.screen}>
          <ScrollView
             style={styles.scroll}
             contentContainerStyle={styles.scrollContent}
@@ -228,10 +228,10 @@ export default function TabsLayout() {
                  <ThemedText style={styles.sidebarTitle}>
                 Kategorie
               </ThemedText>
-               <Pressable  onPress={()=> router.push(`./catalog`)}  style={styles.categoryItem}>
-                <MaterialIcons name="grid-view" size={32} color="blue" style={styles.categoryIcon} />
+               <Pressable  onPress={()=> router.push(`./catalog`)}  style={[styles.categoryItem, styles.categoryItemActive]}>
+                <MaterialIcons name="grid-view" size={32} color="#176BDE" style={styles.categoryIcon} />
 
-                    <ThemedText style={styles.categoryText}>Wszystkie kategorie</ThemedText>
+                    <ThemedText style={[styles.categoryText, styles.categoryTextActive]}>Wszystkie kategorie</ThemedText>
 
                   </Pressable>
                    <Pressable  onPress={()=> router.push("/promotions/promotions")}  style={styles.categoryItem}>
@@ -262,68 +262,84 @@ export default function TabsLayout() {
                 {/* GÓRNY RZĄD FILTRÓW */}
                 <View style={styles.filtersTopRow}>
                   <View  style={styles.filterGroup}>
-                    <ThemedText>Cena od</ThemedText>
-                    <TextInput placeholder="od 0 zł" />
+                    <ThemedText style={styles.filterLabel}>Cena od</ThemedText>
+                    <TextInput
+                      style={styles.filterInput}
+                      placeholder="od 0 zł"
+                      placeholderTextColor="#91A0B8"
+                    />
                   </View>
 
-                  <View>
-                    <ThemedText>Cena do</ThemedText>
-                    <TextInput placeholder="do 5000 zł" />
+                  <View style={styles.filterGroup}>
+                    <ThemedText style={styles.filterLabel}>Cena do</ThemedText>
+                    <TextInput
+                      style={styles.filterInput}
+                      placeholder="do 5000 zł"
+                      placeholderTextColor="#91A0B8"
+                    />
                   </View>
 
-                  <View>
-                    <ThemedText>Cena min</ThemedText>
+                  <View style={styles.filterGroup}>
+                    <ThemedText style={styles.filterLabel}>Cena min</ThemedText>
 
-                    <Pressable>
-                      <ThemedText>min. 1 dzień</ThemedText>
-                      <ThemedText>⌄</ThemedText>
+                    <Pressable style={styles.filterSelect}>
+                      <ThemedText style={styles.filterValue}>min. 1 dzień</ThemedText>
+                      <ThemedText style={styles.filterChevron}>⌄</ThemedText>
                     </Pressable>
                   </View>
 
-                  <View>
-                    <ThemedText>Cena max</ThemedText>
+                  <View style={styles.filterGroup}>
+                    <ThemedText style={styles.filterLabel}>Cena max</ThemedText>
 
-                    <Pressable>
-                      <ThemedText>max. 30 dni</ThemedText>
-                      <ThemedText>⌄</ThemedText>
+                    <Pressable style={styles.filterSelect}>
+                      <ThemedText style={styles.filterValue}>max. 30 dni</ThemedText>
+                      <ThemedText style={styles.filterChevron}>⌄</ThemedText>
                     </Pressable>
                   </View>
 
-                  <View>
-                    <ThemedText>Sortuj</ThemedText>
+                  <View style={styles.filterGroup}>
+                    <ThemedText style={styles.filterLabel}>Sortuj</ThemedText>
 
-                    <Pressable>
-                      <ThemedText>Cena rosnąco</ThemedText>
-                      <ThemedText>⌄</ThemedText>
+                    <Pressable style={styles.filterSelect}>
+                      <ThemedText style={styles.filterValue}>Cena rosnąco</ThemedText>
+                      <ThemedText style={styles.filterChevron}>⌄</ThemedText>
                     </Pressable>
                   </View>
 
-                  <Pressable>
-                    <ThemedText>◆</ThemedText>
-                    <ThemedText>Promocja</ThemedText>
-                    <ThemedText>OFF</ThemedText>
+                  <Pressable style={styles.promotionFilter}>
+                    <ThemedText style={styles.promotionIcon}>◆</ThemedText>
+                    <ThemedText style={styles.promotionLabel}>Promocja</ThemedText>
+                    <View style={styles.switchTrack}>
+                      <View style={styles.switchThumb} />
+                    </View>
                   </Pressable>
                 </View>
 
                 {/* DOLNY RZĄD FILTRÓW */}
                 <View style={styles.filtersBottomRow}>
                   <View style={styles.filterActions}>
-                    <Pressable>
-                      <ThemedText>☷</ThemedText>
-                      <ThemedText>Więcej filtrów</ThemedText>
+                    <Pressable style={[styles.filterActionButton, styles.filterActionButtonPrimary]}>
+                      <ThemedText style={styles.filterActionIcon}>☷</ThemedText>
+                      <ThemedText style={styles.filterActionTextPrimary}>Więcej filtrów</ThemedText>
                     </Pressable>
 
-                    <Pressable>
-                      <ThemedText>↻</ThemedText>
-                      <ThemedText>Wyczyść filtry</ThemedText>
+                    <Pressable style={styles.filterActionButton}>
+                      <ThemedText style={styles.filterActionIconMuted}>↻</ThemedText>
+                      <ThemedText style={styles.filterActionText}>Wyczyść filtry</ThemedText>
                     </Pressable>
                   </View>
 
-                  <ThemedText>Znaleziono: 120 produktów</ThemedText>
+                  <ThemedText style={styles.resultsText}>Znaleziono: 120 produktów</ThemedText>
                 </View>
               </View>
              {/* LISTA PRODUKTÓW */}
-  <FlatList data={tab_filtered} keyExtractor={(elem)=> elem.id.toString()} numColumns={4} renderItem={({item})=> (
+  <FlatList
+    data={tab_filtered}
+    keyExtractor={(elem)=> elem.id.toString()}
+    numColumns={4}
+    columnWrapperStyle={styles.productsRow}
+    contentContainerStyle={styles.productsGrid}
+    renderItem={({item})=> (
         <View style={styles.productCard}>
           {/*poprawny link do prodkutu */}
           <Pressable onPress={()=> router.push(`../../products/${item.id}`)}>
@@ -406,17 +422,50 @@ export default function TabsLayout() {
 
 </FlatList>
 
+              <View style={styles.pagination}>
+                <View style={styles.paginationSide} />
+
+                <View style={styles.paginationPages}>
+                  <View style={[styles.paginationButton, styles.paginationButtonDisabled]}>
+                    <MaterialIcons name="chevron-left" size={20} color="#B8C4D6" />
+                  </View>
+                  <View style={[styles.paginationButton, styles.paginationButtonActive]}>
+                    <Text style={styles.paginationTextActive}>1</Text>
+                  </View>
+                  <View style={styles.paginationButton}>
+                    <Text style={styles.paginationText}>2</Text>
+                  </View>
+                  <View style={styles.paginationButton}>
+                    <Text style={styles.paginationText}>3</Text>
+                  </View>
+                  <View style={styles.paginationButton}>
+                    <Text style={styles.paginationText}>4</Text>
+                  </View>
+                  <View style={styles.paginationButton}>
+                    <Text style={styles.paginationText}>...</Text>
+                  </View>
+                  <View style={styles.paginationButton}>
+                    <Text style={styles.paginationText}>10</Text>
+                  </View>
+                  <View style={styles.paginationButton}>
+                    <MaterialIcons name="chevron-right" size={20} color="#172033" />
+                  </View>
+                </View>
+
+                <View style={styles.paginationSide}>
+                  <Text style={styles.pageSizeLabel}>Pokaż na stronie:</Text>
+                  <View style={styles.pageSizeSelect}>
+                    <Text style={styles.pageSizeValue}>12</Text>
+                    <MaterialIcons name="expand-more" size={19} color="#172033" />
+                  </View>
+                </View>
+              </View>
+
               </View>
 
 
 </View>
 
-
-
-
-
-      <ThemedText> WSZYSTKO </ThemedText>
-    
 
     </View>
     </View>
@@ -426,16 +475,29 @@ export default function TabsLayout() {
 }
 
 const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    backgroundColor: "#F4F7FC",
+  },
+
+  page: {
+    width: "100%",
+    maxWidth: 1920,
+    alignSelf: "center",
+    paddingTop: 16,
+    paddingHorizontal: 40,
+  },
+
   header: {
     width: "100%",
-    minHeight: 72,
+    minHeight: 76,
     backgroundColor: "#FFFFFF",
-    borderRadius: 24,
+    borderRadius: 22,
     paddingHorizontal: 24,
-    paddingVertical: 14,
+    paddingVertical: 12,
     flexDirection: "row",
     alignItems: "center",
-    gap: 24,
+    gap: 18,
     zIndex : 200,
     position : "relative",
     shadowColor: "#0F172A",
@@ -443,6 +505,12 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.06,
     shadowRadius: 18,
     elevation: 4,
+  },
+
+  headerName: {
+    minWidth: 126,
+    alignItems: "flex-start",
+    justifyContent: "center",
   },
 
   logoBox: {
@@ -453,21 +521,22 @@ const styles = StyleSheet.create({
   },
 
   logo: {
-  width: 52,
-  height: 52,
-  zIndex: 1,
-
+    width: 126,
+    height: 42,
+    zIndex: 1,
   },
 
   searchBar: {
     position : "relative",
     flex: 1,
-    height: 48,
+    minWidth: 300,
+    maxWidth: 680,
+    height: 46,
     backgroundColor: "#FFFFFF",
     borderWidth: 1,
     borderColor: "#E2E8F0",
-    borderRadius: 999,
-    paddingHorizontal: 18,
+    borderRadius: 14,
+    paddingHorizontal: 16,
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
@@ -485,7 +554,22 @@ const styles = StyleSheet.create({
   headerActions: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 22,
+    gap: 18,
+  },
+
+  headerSideActions: {
+    flexShrink: 0,
+  },
+
+  headerInfo: {
+    minHeight: 36,
+    justifyContent: "center",
+  },
+
+  headerInfoText: {
+    color: "#172033",
+    fontSize: 13,
+    fontWeight: "600",
   },
 
   headerAction: {
@@ -496,7 +580,7 @@ const styles = StyleSheet.create({
 
 
   headerActionText: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: "700",
     color: "#111827",
   },
@@ -574,8 +658,9 @@ suggestionPrice: {
     fontWeight: "700",
   },
   category_path: {
-    marginTop: 28,
-    marginBottom: 24,
+    marginTop: 24,
+    marginBottom: 16,
+    paddingHorizontal: 12,
     flexDirection: "row",
     alignItems: "center",
     flexWrap: "nowrap",
@@ -586,9 +671,9 @@ pageHeading: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 16,
-    marginTop: 18,
-    marginBottom: 22,
+    paddingHorizontal: 12,
+    marginBottom: 20,
+    gap: 24,
   },
 
   pageHeadingContent: {
@@ -597,25 +682,26 @@ pageHeading: {
 
   pageTitle: {
     color: "#111827",
-    fontSize: 42,
-    lineHeight: 48,
+    fontSize: 40,
+    lineHeight: 46,
     fontWeight: "900",
   },
 
   pageDescription: {
     color: "#7A89A6",
     fontSize: 14,
-    marginTop: 6,
+    lineHeight: 21,
+    marginTop: 5,
   },
 
   productsInfo: {
-    minWidth: 235,
+    minWidth: 220,
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#FFFFFF",
-    borderRadius: 18,
-    paddingHorizontal: 20,
-    paddingVertical: 16,
+    borderRadius: 17,
+    paddingHorizontal: 18,
+    paddingVertical: 14,
     gap: 12,
 
     shadowColor: "#1E3A8A",
@@ -658,15 +744,15 @@ pageHeading: {
     width: "100%",
     flexDirection: "row",
     alignItems: "flex-start",
-    gap: 20,
+    gap: 18,
   },
 
   categoriesSidebar: {
-    width: 215,
+    width: 218,
     backgroundColor: "#FFFFFF",
-    borderRadius: 20,
-    paddingHorizontal: 16,
-    paddingVertical: 22,
+    borderRadius: 18,
+    paddingHorizontal: 14,
+    paddingVertical: 20,
 
     shadowColor: "#1E3A8A",
     shadowOffset: {
@@ -686,32 +772,45 @@ pageHeading: {
   },
 
   categoryItem: {
-    minHeight: 50,
+    minHeight: 48,
     flexDirection: "row",
     alignItems: "center",
-    borderRadius: 12,
+    borderRadius: 11,
     paddingHorizontal: 12,
     marginBottom: 4,
     gap: 12,
+  },
+  categoryItemActive: {
+    backgroundColor: "#EEF4FF",
   },
    categoryText: {
     color: "#263247",
     fontSize: 13,
     fontWeight: "600",
   },
+  categoryTextActive: {
+    color: "#176BDE",
+    fontWeight: "700",
+  },
    categoryIcon: {
     width: 20,
     fontSize: 19,
     textAlign: "center",
   },
+  productsGrid: {
+    gap: 14,
+  },
+  productsRow: {
+    gap: 12,
+  },
    productCard: {
     flex: 1,
-    minHeight: 310,
+    minHeight: 324,
     backgroundColor: "#FFFFFF",
-    borderRadius: 24,
+    borderRadius: 20,
     borderWidth: 1,
     borderColor: "#E2E8F0",
-    padding: 18,
+    padding: 16,
     position: "relative",
 
     shadowColor: "#0F172A",
@@ -734,7 +833,7 @@ pageHeading: {
   },
 
   productImageBox: {
-    height: 150,
+    height: 142,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 14,
@@ -750,7 +849,7 @@ pageHeading: {
   },
 
   productName: {
-    fontSize: 17,
+    fontSize: 15,
     fontWeight: "900",
     color: "#111827",
     marginBottom: 4,
@@ -771,8 +870,8 @@ pageHeading: {
     fontWeight: "800",
   },
   productDescription: {
-    fontSize: 13,
-    lineHeight: 18,
+    fontSize: 12,
+    lineHeight: 17,
     color: "#64748B",
     minHeight: 36,
   },
@@ -785,7 +884,7 @@ pageHeading: {
   },
 
   productPrice: {
-    fontSize: 19,
+    fontSize: 17,
     fontWeight: "900",
     color: "#111827",
     marginBottom: 8,
@@ -814,10 +913,11 @@ pageHeading: {
     backgroundColor: "#FFFFFF",
   },
   scroll: {
-  flex: 1,
+    flex: 1,
+    backgroundColor: "#F4F7FC",
   },
   scrollContent: {
-    paddingBottom: 60,
+    paddingBottom: 34,
   },
   catalogContent: {
     flex: 1,
@@ -827,10 +927,10 @@ pageHeading: {
   filtersPanel: {
     width: "100%",
     backgroundColor: "#FFFFFF",
-    borderRadius: 20,
-    paddingHorizontal: 18,
+    borderRadius: 18,
+    paddingHorizontal: 20,
     paddingVertical: 18,
-    marginBottom: 16,
+    marginBottom: 14,
 
     shadowColor: "#1E3A8A",
     shadowOffset: {
@@ -846,15 +946,220 @@ pageHeading: {
     width: "100%",
     flexDirection: "row",
     alignItems: "flex-end",
-    gap: 14,
+    gap: 12,
   },
    filterGroup: {
     flex: 1,
-    minWidth: 115,
+    minWidth: 112,
+  },
+  filterLabel: {
+    color: "#273247",
+    fontSize: 12,
+    lineHeight: 16,
+    fontWeight: "700",
+    marginBottom: 7,
+  },
+  filterInput: {
+    width: "100%",
+    height: 42,
+    borderWidth: 1,
+    borderColor: "#DDE5F0",
+    borderRadius: 10,
+    paddingHorizontal: 13,
+    color: "#172033",
+    backgroundColor: "#FFFFFF",
+    fontSize: 13,
+    outlineStyle: "none" as any,
+  },
+  filterSelect: {
+    width: "100%",
+    height: 42,
+    borderWidth: 1,
+    borderColor: "#DDE5F0",
+    borderRadius: 10,
+    paddingHorizontal: 13,
+    backgroundColor: "#FFFFFF",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 8,
+  },
+  filterValue: {
+    color: "#8290A8",
+    fontSize: 13,
+  },
+  filterChevron: {
+    color: "#557099",
+    fontSize: 15,
+    lineHeight: 16,
+  },
+  promotionFilter: {
+    width: 178,
+    height: 42,
+    borderWidth: 1,
+    borderColor: "#DDE5F0",
+    borderRadius: 10,
+    paddingHorizontal: 13,
+    backgroundColor: "#FFFFFF",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 9,
+  },
+  promotionIcon: {
+    color: "#F43F5E",
+    fontSize: 15,
+  },
+  promotionLabel: {
+    flex: 1,
+    color: "#273247",
+    fontSize: 13,
+    fontWeight: "600",
+  },
+  switchTrack: {
+    width: 38,
+    height: 21,
+    borderRadius: 999,
+    padding: 2,
+    backgroundColor: "#D8E1ED",
+    alignItems: "flex-start",
+    justifyContent: "center",
+  },
+  switchThumb: {
+    width: 17,
+    height: 17,
+    borderRadius: 999,
+    backgroundColor: "#FFFFFF",
+  },
+  filtersBottomRow: {
+    width: "100%",
+    marginTop: 17,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 16,
+  },
+  filterActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  filterActionButton: {
+    minHeight: 34,
+    borderWidth: 1,
+    borderColor: "#DDE5F0",
+    borderRadius: 9,
+    paddingHorizontal: 13,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    backgroundColor: "#FFFFFF",
+  },
+  filterActionButtonPrimary: {
+    borderColor: "#CFE0F8",
+  },
+  filterActionIcon: {
+    color: "#176BDE",
+    fontSize: 16,
+  },
+  filterActionIconMuted: {
+    color: "#536987",
+    fontSize: 16,
+  },
+  filterActionTextPrimary: {
+    color: "#176BDE",
+    fontSize: 12,
+    fontWeight: "700",
+  },
+  filterActionText: {
+    color: "#53627A",
+    fontSize: 12,
+    fontWeight: "600",
+  },
+  resultsText: {
+    color: "#7786A1",
+    fontSize: 12,
+  },
+  pagination: {
+    width: "100%",
+    minHeight: 44,
+    marginTop: 32,
+    paddingHorizontal: 4,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 18,
+  },
+  paginationSide: {
+    flex: 1,
+    minWidth: 190,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    gap: 12,
+  },
+  paginationPages: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 9,
+  },
+  paginationButton: {
+    width: 36,
+    height: 36,
+    borderWidth: 1,
+    borderColor: "#E1E8F2",
+    borderRadius: 9,
+    backgroundColor: "#FFFFFF",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  paginationButtonDisabled: {
+    backgroundColor: "#F9FBFE",
+  },
+  paginationButtonActive: {
+    borderColor: "#176BDE",
+    backgroundColor: "#176BDE",
+    shadowColor: "#176BDE",
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    elevation: 3,
+  },
+  paginationText: {
+    color: "#172033",
+    fontSize: 13,
+    fontWeight: "600",
+  },
+  paginationTextActive: {
+    color: "#FFFFFF",
+    fontSize: 13,
+    fontWeight: "700",
+  },
+  pageSizeLabel: {
+    color: "#7786A1",
+    fontSize: 12,
+  },
+  pageSizeSelect: {
+    width: 76,
+    height: 40,
+    borderWidth: 1,
+    borderColor: "#E1E8F2",
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    backgroundColor: "#FFFFFF",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  pageSizeValue: {
+    color: "#172033",
+    fontSize: 13,
+    fontWeight: "700",
   },
   mainContent : {
     width : "100%",
-    marginTop : 22,
+    marginTop : 0,
   }
 
 
