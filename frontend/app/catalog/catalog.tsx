@@ -12,10 +12,11 @@ import { router } from "expo-router";
 type CatalogViewProps = {
   kategoriaId?: string;
   tylkoPromocje? : boolean;
+  promocja? : boolean;
   };
 
 
-export default function TabsLayout({kategoriaId,tylkoPromocje} : CatalogViewProps) {
+export default function TabsLayout({kategoriaId,tylkoPromocje, promocja} : CatalogViewProps) {
   {/*kategorie-dostepne */}
     
   const kategorieMap = new Map();
@@ -63,10 +64,12 @@ export default function TabsLayout({kategoriaId,tylkoPromocje} : CatalogViewProp
     const {query} = useLocalSearchParams();
     const [searchText,setsearchText] = useState("")
     const searchQuery = String(query ?? "").toLowerCase();
+    
     const tab_filtered = tab.filter((item)=> {
+      const promocjeAktywne = tylkoPromocje || promocja 
        const filterSearch = item.nazwa.toLowerCase().includes(searchQuery);
        const filterCategory = !kategoriaId || String(item.kategoria_id) === String(kategoriaId);
-       const filterPromotion = !tylkoPromocje || item.promocja === true
+       const filterPromotion = !promocjeAktywne || item.promocja === true
 
        return filterSearch && filterCategory && filterPromotion
       })
