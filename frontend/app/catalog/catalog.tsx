@@ -521,9 +521,10 @@ const styles = StyleSheet.create({
   },
 
   logo: {
-    width: 126,
-    height: 42,
-    zIndex: 1,
+  width: 52,
+  height: 52,
+  zIndex: 1,
+
   },
 
   searchBar: {

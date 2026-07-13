@@ -170,19 +170,17 @@ export default function User() {
   > 
          <View style={styles.headerSideActions}>
           {/*onHoverIn, onHoverOut - działaja tylko na web , do mobliek dodac onPressIn, onPressOut */}
-                <Pressable style={styles.headerInfo} onHoverIn={()=>setshowcategoryPanel(true)} onHoverOut={()=> setshowcategoryPanel(false)}  >
+                <View style={styles.headerInfo}   >
                   <Text style={styles.headerInfoText}>Kategorie</Text>
-                </Pressable>
+                </View>
              </View>
       {/*ROZWIJANY PANEL KATEGORII, NARAZIE NIE WSZYSTKIE KATEGORIE */}
       {/*przeniesienie do odpowiedniego widoku kategorii, dodac ikonki do poszczegółnych kategorii */}
       {showcategoryPanel && <View style={styles.categoryPanel} >
-        {Array.from(kategorieMap).map((item,index)=>
-        <Pressable key={index} style={styles.categoryItem}> 
+        {Array.from(kategorieMap).map(([key,val],index)=>
         <View style={styles.categoryInfo}>
-          <Text style={styles.categoryName}>{item}</Text>
+          <Text style={styles.categoryName} onPress={()=>router.push(`../catalog/category/${key}`)}>{val}</Text>
         </View>
-         </Pressable>
         ) }
         
         </View>
@@ -1050,7 +1048,7 @@ suggestionPrice: {
 },
 categoryPanel : {
  position: "absolute",
-  top: 52,
+  top: "100%",
   left: -20,
   transform: [{ translateX: -110 }],
   backgroundColor: "#FFFFFF",
